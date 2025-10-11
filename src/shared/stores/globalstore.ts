@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { User } from "../../iam/model/user";
-import { authService } from "../../iam/services/user-services";
 import { VerifyTotpRequest } from "../../iam/model/verify-totp-request";
+import { authService } from "../../iam/services/user-services";
 
 
 interface GlobalState {
@@ -67,6 +67,7 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
             if (response.data) {
                 const token = response.data.token;
                 console.log("Token recibido:", token);
+                sessionStorage.setItem("token", token);
             }
 
             return response.status == 200;
