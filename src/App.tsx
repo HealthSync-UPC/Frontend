@@ -6,6 +6,7 @@ import { Qrimg } from "./iam/components/Qrimg"
 import { CodeAuth } from "./iam/components/CodeAuth"
 import { LoginForm } from "./iam/components/LoginForm"
 import { MainLayout } from "./shared/pages/MainLayout"
+import { DashboardPage } from "./dashboard/pages/DashboardPage"
 
 function App() {
   return (
@@ -19,7 +20,12 @@ function App() {
       </Route>
 
       <Route element={<MainLayout />}>
-        <Route path="/dashboard" element={<p>Dashboard</p>} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/devices" element={<p>IoT Devices</p>} />
+        <Route path="/monitoring" element={<p>Monitoring</p>} />
+        <Route path="/alerts" element={<p>Alerts</p>} />
+        <Route path="/inventory" element={<p>Inventory</p>} />
+        <Route path="/report" element={<p>Report</p>} />
         <Route path="/settings" element={<p>Settings</p>} />
       </Route>
 
