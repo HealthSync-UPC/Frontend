@@ -64,6 +64,7 @@ export function RegisterForm() {
 
             <div className="flex flex-col gap-3 " >
                 <button
+                    type="button"
                     onClick={() => { navigator("/login") }}
                     className="border-1 border-gray-300 rounded-md py-2 px-2"
                 >

@@ -5,6 +5,7 @@ import { RegisterForm } from "./iam/components/RegisterForm"
 import { Qrimg } from "./iam/components/Qrimg"
 import { CodeAuth } from "./iam/components/CodeAuth"
 import { LoginForm } from "./iam/components/LoginForm"
+import { MainLayout } from "./shared/pages/MainLayout"
 
 function App() {
   return (
@@ -15,8 +16,13 @@ function App() {
         <Route path="/verify" element={<CodeAuth />} />
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/setup-mfa" element={<Qrimg />} />
-
       </Route>
+
+      <Route element={<MainLayout />}>
+        <Route path="/dashboard" element={<p>Dashboard</p>} />
+        <Route path="/settings" element={<p>Settings</p>} />
+      </Route>
+
     </Routes>
   )
 
