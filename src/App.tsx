@@ -7,6 +7,7 @@ import { CodeAuth } from "./iam/components/CodeAuth"
 import { LoginForm } from "./iam/components/LoginForm"
 import { MainLayout } from "./shared/pages/MainLayout"
 import { DashboardPage } from "./dashboard/pages/DashboardPage"
+import { IoTPage } from "./iot/pages/IoTPage"
 
 function App() {
   return (
@@ -21,7 +22,7 @@ function App() {
 
       <Route element={<MainLayout />}>
         <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/devices" element={<p>IoT Devices</p>} />
+        <Route path="/devices" element={<IoTPage />} />
         <Route path="/monitoring" element={<p>Monitoring</p>} />
         <Route path="/alerts" element={<p>Alerts</p>} />
         <Route path="/inventory" element={<p>Inventory</p>} />
