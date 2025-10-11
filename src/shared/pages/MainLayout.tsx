@@ -27,7 +27,7 @@ export function MainLayout() {
     return (
         <div className="flex flex-col w-full h-screen">
             {/* Header */}
-            <div className="flex gap-5 items-center bg-[#F9FCFF] p-4">
+            <div className="flex gap-5 items-center bg-[#F9FCFF] p-4 border-b-1 border-[#dfe6eb]">
                 <img src="/logo.png" alt="Logo" className="w-10 h-auto" />
                 <h1 className="font-semibold text-3xl">MediTrack</h1>
             </div>
@@ -35,7 +35,7 @@ export function MainLayout() {
             {/* Body */}
             <div className="flex flex-1">
                 {/* Sidebar */}
-                <div className="w-[14%] bg-[#F9FCFF] flex flex-col justify-between text-[#040C13] font-medium p-4 border-r border-gray-200">
+                <div className="w-[14%] bg-[#F9FCFF] flex flex-col justify-between text-[#040C13] font-medium p-4 border-r border-[#dfe6eb]">
                     {/* Top menu */}
                     <div className="flex flex-col gap-3">
                         {menuItems.map((item) => {
@@ -80,7 +80,7 @@ export function MainLayout() {
                 </div>
 
                 {/* Main content */}
-                <div className="flex-1 bg-white p-6 overflow-auto">
+                <div className="flex-1 bg-white p-6 overflow-auto mx-20 mt-10">
                     <Outlet />
                 </div>
             </div>
