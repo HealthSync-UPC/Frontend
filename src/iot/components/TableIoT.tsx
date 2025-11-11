@@ -26,7 +26,9 @@ export function TableIoT() {
 
                         {/* Device rows */}
                         <div className="divide-y divide-[#DFE6EB] mt-2">
-                            {/* Row 1 */}
+
+                            {/*  
+                           tabla 1
                             <div className="flex justify-between items-center py-4">
                                 <span className="w-[20%] font-semibold">TEMP-001</span>
                                 <div className="w-[35%] flex flex-col">
@@ -44,7 +46,7 @@ export function TableIoT() {
                                 </div>
                             </div>
 
-                            {/* Row 2 */}
+                            tabla 2
                             <div className="flex justify-between items-center py-4">
                                 <span className="w-[20%] font-semibold">HUM-002</span>
                                 <div className="w-[35%] flex flex-col">
@@ -62,7 +64,7 @@ export function TableIoT() {
                                 </div>
                             </div>
 
-                            {/* Row 3 */}
+                          tabla 3
                             <div className="flex justify-between items-center py-4">
                                 <span className="w-[20%] font-semibold">DOOR-003</span>
                                 <div className="w-[35%] flex flex-col">
@@ -80,7 +82,7 @@ export function TableIoT() {
                                 </div>
                             </div>
 
-                            {/* Row 4 */}
+                           tabla 4
                             <div className="flex justify-between items-center py-4">
                                 <span className="w-[20%] font-semibold">PWR-004</span>
                                 <div className="w-[35%] flex flex-col">
@@ -98,7 +100,7 @@ export function TableIoT() {
                                 </div>
                             </div>
 
-                            {/* Row 5 */}
+                          tabla 5
                             <div className="flex justify-between items-center py-4">
                                 <span className="w-[20%] font-semibold">MULTI-005</span>
                                 <div className="w-[35%] flex flex-col">
@@ -114,7 +116,9 @@ export function TableIoT() {
                                         Offline
                                     </div>
                                 </div>
-                            </div>
+                            </div> 
+                            */}
+
                         </div>
                     </div>
                 </div>
