@@ -8,6 +8,7 @@ import { LoginForm } from "./iam/components/LoginForm"
 import { MainLayout } from "./shared/pages/MainLayout"
 import { DashboardPage } from "./dashboard/pages/DashboardPage"
 import { IoTPage } from "./iot/pages/IoTPage"
+import { ReportsPage } from "./reports/page/ReportsPage"
 
 function App() {
   return (
@@ -26,7 +27,7 @@ function App() {
         <Route path="/monitoring" element={<p>Monitoring</p>} />
         <Route path="/alerts" element={<p>Alerts</p>} />
         <Route path="/inventory" element={<p>Inventory</p>} />
-        <Route path="/report" element={<p>Report</p>} />
+        <Route path="/report" element={<ReportsPage />} />
         <Route path="/settings" element={<p>Settings</p>} />
       </Route>
 
