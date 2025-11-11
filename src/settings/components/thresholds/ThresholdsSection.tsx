@@ -1,8 +1,15 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import DeviceThermostatIcon from '@mui/icons-material/DeviceThermostat';
 import OpacityIcon from '@mui/icons-material/Opacity';
 import { SectionCard } from '../navbar/ui';
 
+// Constantes (sin useMemo)
+const LOCATIONS_TEMP = [
+    'Pharmacy Cold Storage A',
+    'Vaccine Storage Unit',
+    'Blood Bank Storage',
+    'Laboratory Refrigerator',
+];
 
 export function ThresholdsSection() {
     const [temp] = useState([
@@ -12,11 +19,7 @@ export function ThresholdsSection() {
         { title: 'Laboratory Refrigerator', min: 2, max: 8, unit: '°C' },
     ]);
 
-    const locationsTemp = useMemo(
-        () => ['Pharmacy Cold Storage A', 'Vaccine Storage Unit', 'Blood Bank Storage', 'Laboratory Refrigerator'],
-        []
-    );
-    const [selectedTemp, setSelectedTemp] = useState(locationsTemp[0]);
+    const [selectedTemp, setSelectedTemp] = useState(LOCATIONS_TEMP[0]);
 
     const [humidity, setHumidity] = useState([{ title: 'Storage Room C', max: 60, unit: '%RH' }]);
     const [selectedHum, setSelectedHum] = useState('Storage Room C');
@@ -37,7 +40,9 @@ export function ThresholdsSection() {
                     <DeviceThermostatIcon fontSize="small" />
                     <p className="text-base sm:text-lg font-semibold">Temperature Thresholds</p>
                 </div>
-                <p className="text-sm text-[#67737C] mb-5">Configure temperature limits for different storage areas</p>
+                <p className="text-sm text-[#67737C] mb-5">
+                    Configure temperature limits for different storage areas
+                </p>
 
                 <div className="flex flex-col lg:flex-row lg:items-end gap-3">
                     <label className="text-xs text-[#67737C] flex flex-col gap-1">
@@ -47,23 +52,35 @@ export function ThresholdsSection() {
                             onChange={(e) => setSelectedTemp(e.target.value)}
                             className="h-10 min-w-[220px] rounded-md border border-gray-300 px-3"
                         >
-                            {locationsTemp.map((opt) => <option key={opt}>{opt}</option>)}
+                            {LOCATIONS_TEMP.map((opt) => (
+                                <option key={opt}>{opt}</option>
+                            ))}
                         </select>
                     </label>
 
                     <label className="text-xs text-[#67737C] flex flex-col gap-1">
                         Min Temperature (°C)
-                        <input className="h-10 w-24 rounded-md border border-gray-300 px-3 text-center" defaultValue={2} />
+                        <input
+                            className="h-10 w-24 rounded-md border border-gray-300 px-3 text-center"
+                            defaultValue={2}
+                        />
                     </label>
 
                     <label className="text-xs text-[#67737C] flex flex-col gap-1">
                         Max Temperature (°C)
-                        <input className="h-10 w-24 rounded-md border border-gray-300 px-3 text-center" defaultValue={8} />
+                        <input
+                            className="h-10 w-24 rounded-md border border-gray-300 px-3 text-center"
+                            defaultValue={8}
+                        />
                     </label>
 
                     <div className="flex gap-3 lg:ml-auto">
-                        <button className="h-10 px-4 rounded-md bg-[#00648E] text-white text-sm hover:bg-[#005273]">Update Threshold</button>
-                        <button className="h-10 px-4 rounded-md border border-gray-300 text-sm hover:bg-gray-50">Add Location</button>
+                        <button className="h-10 px-4 rounded-md bg-[#00648E] text-white text-sm hover:bg-[#005273]">
+                            Update Threshold
+                        </button>
+                        <button className="h-10 px-4 rounded-md border border-gray-300 text-sm hover:bg-gray-50">
+                            Add Location
+                        </button>
                     </div>
                 </div>
 
@@ -72,12 +89,19 @@ export function ThresholdsSection() {
                 <p className="font-medium mb-3">Current Thresholds</p>
                 <div className="flex flex-col gap-3">
                     {temp.map((t, i) => (
-                        <div key={t.title + i} className="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3">
+                        <div
+                            key={t.title + i}
+                            className="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3"
+                        >
                             <div className="min-w-0">
                                 <p className="font-medium truncate">{t.title}</p>
-                                <p className="text-sm text-[#67737C]">{t.min}°C to {t.max}°C</p>
+                                <p className="text-sm text-[#67737C]">
+                                    {t.min}°C to {t.max}°C
+                                </p>
                             </div>
-                            <button className="h-9 px-4 rounded-md border border-gray-300 text-sm hover:bg-gray-50">Edit</button>
+                            <button className="h-9 px-4 rounded-md border border-gray-300 text-sm hover:bg-gray-50">
+                                Edit
+                            </button>
                         </div>
                     ))}
                 </div>
@@ -99,7 +123,9 @@ export function ThresholdsSection() {
                             onChange={(e) => setSelectedHum(e.target.value)}
                             className="h-10 min-w-[220px] rounded-md border border-gray-300 px-3"
                         >
-                            {['Storage Room C', 'Storage Room D', 'Archive A'].map((opt) => <option key={opt}>{opt}</option>)}
+                            {['Storage Room C', 'Storage Room D', 'Archive A'].map((opt) => (
+                                <option key={opt}>{opt}</option>
+                            ))}
                         </select>
                     </label>
 
@@ -114,13 +140,18 @@ export function ThresholdsSection() {
                     </label>
 
                     <div className="lg:ml-auto">
-                        <button className="h-10 px-6 rounded-md bg-[#00648E] text-white text-sm hover:bg-[#005273]">Update</button>
+                        <button className="h-10 px-6 rounded-md bg-[#00648E] text-white text-sm hover:bg-[#005273]">
+                            Update
+                        </button>
                     </div>
                 </div>
             </SectionCard>
 
             <div className="flex justify-end">
-                <button onClick={saveThresholds} className="h-10 px-8 rounded-md bg-[#00648E] text-white text-sm hover:bg-[#005273]">
+                <button
+                    onClick={saveThresholds}
+                    className="h-10 px-8 rounded-md bg-[#00648E] text-white text-sm hover:bg-[#005273]"
+                >
                     Save Thresholds (mock)
                 </button>
             </div>
