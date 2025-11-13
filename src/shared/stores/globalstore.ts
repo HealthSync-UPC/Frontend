@@ -3,8 +3,10 @@ import { immer } from "zustand/middleware/immer";
 import { User } from "../../iam/model/user";
 import { VerifyTotpRequest } from "../../iam/model/verify-totp-request";
 import { authService } from "../../iam/services/user-services";
-
-
+import type { JwtPayload } from "jwt-decode";
+import { getTokenData } from "../utils/jwt-decode";
+import { User as Profile } from "../../settings/model/User";
+import { profileService } from "../../settings/services/userService";
 interface GlobalState {
     // IAM
     user: User;
@@ -13,9 +15,17 @@ interface GlobalState {
     login: () => Promise<"200" | "202" | "error">;
     qrCode?: string;
     verifyCode: (code: number) => Promise<boolean>;
+    jwt: JwtPayload | null;
+    setJwt: (token: string) => void;
+
+    // Settings
+    profiles: Profile[],
+    getProfiles: () => Promise<void>;
+    addProfile: (profile: Profile) => Promise<void>;
 }
 
 export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
+    // IAM
     user: new User("", "", ""),
     setUser: (user: Partial<User>) => set((state) => {
         state.user = Object.assign(new User("", "", ""), { ...state.user, ...user });
@@ -66,14 +76,48 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
 
             if (response.data) {
                 const token = response.data.token;
-                console.log("Token recibido:", token);
-                sessionStorage.setItem("token", token);
+                localStorage.setItem("token", token);
+                set(state => { state.jwt = getTokenData(token); });
             }
 
             return response.status == 200;
         } catch (error) {
             console.error("Error during code verification:", error);
             return false;
+        }
+    },
+    jwt: null,
+    setJwt: (token: string) => {
+        set(state => {
+            state.jwt = getTokenData(token);
+        });
+    },
+    // Settings
+    profiles: [],
+    getProfiles: async () => {
+        try {
+            const response = await profileService.getAllProfiles();
+            if (response.data) {
+                set(state => {
+                    state.profiles = response.data;
+                });
+
+                console.log("Fetched profiles:", response.data);
+            }
+        } catch (error) {
+            console.error("Error fetching profiles:", error);
+        }
+    },
+    addProfile: async (profile: Profile) => {
+        try {
+            const response = await profileService.create(profile);
+            if (response.data) {
+                set(state => {
+                    state.profiles.push(response.data!);
+                });
+            }
+        } catch (error) {
+            console.error("Error adding profile:", error);
         }
     }
 })));
