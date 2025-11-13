@@ -1,5 +1,5 @@
 export class User {
-    firstname: string;
+    firstName: string;
     lastName: string;
     email: string;
     qr: string;
@@ -7,7 +7,7 @@ export class User {
     position: string;
 
     constructor(firstname: string, lastName: string, email: string, qr: string, password: string, position: string) {
-        this.firstname = firstname;
+        this.firstName = firstname;
         this.lastName = lastName;
         this.email = email;
         this.qr = qr;
