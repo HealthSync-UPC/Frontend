@@ -3,9 +3,11 @@ import { useState } from 'react';
 import { useGlobalStore } from '../../../shared/stores/globalstore';
 import { Chip, SectionCard } from '../navbar/ui';
 import { AddUserForm } from './AddUserForm';
+import { ModalQR } from './ModalQR';
 
 export function UsersSection() {
     const [showAddUser, setShowAddUser] = useState(false);
+    const [showQR, setShowQR] = useState(false);
     const { profiles } = useGlobalStore();
 
     return (
@@ -32,7 +34,7 @@ export function UsersSection() {
 
                     <div className="rounded-xl border border-gray-200 bg-white divide-y">
                         {profiles.map((u, idx) => (
-                            <div key={`${u.email}-${idx}`} className="flex items-center justify-between px-4 py-4">
+                            <div key={`${u.email}-${idx}`} className="flex items-center justify-between px-4 py-4 border-gray-200">
                                 <div className="min-w-0">
                                     <p className="font-medium truncate">{u.firstName} {u.lastName}</p>
                                     <p className="text-sm text-[#67737C] truncate">{u.email}</p>
@@ -40,7 +42,13 @@ export function UsersSection() {
                                 <div className="flex items-center gap-2">
                                     {/*      <Badge status={u} /> */}
                                     <Chip>{u.position}</Chip>
-                                    <button className="h-8 rounded-md border border-gray-300 px-3 text-sm hover:bg-gray-50">Edit</button>
+                                    <button
+                                        className="py-1 rounded-md bg-[#1E6B8F] text-white px-4 text-xs hover:bg-[#155972]"
+                                        onClick={() => setShowQR(true)}
+                                    >
+                                        View QR
+                                    </button>
+                                    <ModalQR open={showQR} onClose={() => setShowQR(false)} qrCode={u.qr} />
                                 </div>
                             </div>
                         ))}
