@@ -8,8 +8,19 @@ import { PrivateRoute } from "./shared/pages/PrivateRoute"
 import { DashboardPage } from "./dashboard/pages/DashboardPage"
 import { IoTPage } from "./iot/pages/IoTPage"
 import SettingsPage from "./settings/pages/SettingsPage"
+import { useGlobalStore } from "./shared/stores/globalstore"
+import { useEffect } from "react"
 
 function App() {
+  const { setJwt } = useGlobalStore();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setJwt(token);
+    }
+  }, []);
+
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/login" />} />

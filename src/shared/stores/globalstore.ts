@@ -16,6 +16,7 @@ interface GlobalState {
     qrCode?: string;
     verifyCode: (code: number) => Promise<boolean>;
     jwt: JwtPayload | null;
+    setJwt: (token: string) => void;
 
     // Settings
     profiles: Profile[],
@@ -85,7 +86,11 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
         }
     },
     jwt: null,
-
+    setJwt: (token: string) => {
+        set(state => {
+            state.jwt = getTokenData(token);
+        });
+    },
     // Settings
     profiles: [],
     getProfiles: async () => {
