@@ -12,14 +12,12 @@
 export class Readings {
     id: number;
     value: string;
-    numericValue: number;
     readingAt: Date;
 
 
-    constructor(id: number, value: string, numericValue: number, readingAt: Date) {
+    constructor(id: number, value: string, readingAt: Date) {
         this.id = id;
         this.value = value;
-        this.numericValue = numericValue;
         this.readingAt = readingAt;
     }
 }
