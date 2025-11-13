@@ -9,6 +9,7 @@ import type { ReactNode } from "react";
 interface TableIoTProps {
     devices: Iot[];
     onViewReadings: (device: Iot) => void;
+    onAddReading: (device: Iot) => void;   // ⬅️ nuevo callback
 }
 
 type StatusKey = "ONLINE" | "OFFLINE" | "WARNING";
@@ -45,8 +46,7 @@ const typeUI: Record<string, string> = {
     ACCESS_NFC: "Access NFC",
 };
 
-export function TableIoT({ devices, onViewReadings }: TableIoTProps) {
-
+export function TableIoT({ devices, onViewReadings, onAddReading }: TableIoTProps) {
     return (
         <Card className="shadow-none border rounded-2xl bg-[#F9FCFF] border-[#DFE6EB]">
             <CardContent>
@@ -108,13 +108,20 @@ export function TableIoT({ devices, onViewReadings }: TableIoTProps) {
                                             </div>
                                         </div>
 
-                                        {/* Readings Button */}
-                                        <div className="flex justify-end">
+                                        {/* Readings Actions */}
+                                        <div className="flex justify-end gap-2">
                                             <button
-                                                onClick={() => onViewReadings?.(d)}
-                                                className="px-3 py-1 text-xs font-medium bg-[#00648E] text-white rounded-md hover:bg-[#005273] transition-colors"
+                                                onClick={() => onViewReadings(d)}
+                                                className="px-3 py-1 text-xs font-medium border border-[#00648E] text-[#00648E] rounded-md hover:bg-[#E0F2F8] transition-colors"
                                             >
                                                 View
+                                            </button>
+
+                                            <button
+                                                onClick={() => onAddReading(d)}
+                                                className="px-3 py-1 text-xs font-medium bg-[#00648E] text-white rounded-md hover:bg-[#005273] transition-colors"
+                                            >
+                                                Add
                                             </button>
                                         </div>
 
