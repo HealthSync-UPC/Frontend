@@ -21,6 +21,7 @@ interface GlobalState {
     // Settings
     profiles: Profile[],
     getProfiles: () => Promise<void>;
+    addProfile: (profile: Profile) => Promise<void>;
 }
 
 export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
@@ -105,6 +106,18 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
             }
         } catch (error) {
             console.error("Error fetching profiles:", error);
+        }
+    },
+    addProfile: async (profile: Profile) => {
+        try {
+            const response = await profileService.create(profile);
+            if (response.data) {
+                set(state => {
+                    state.profiles.push(response.data!);
+                });
+            }
+        } catch (error) {
+            console.error("Error adding profile:", error);
         }
     }
 })));

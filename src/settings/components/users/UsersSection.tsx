@@ -1,50 +1,12 @@
-import { useState } from 'react';
 import GroupIcon from '@mui/icons-material/Group';
-import { Badge, Chip, SectionCard } from '../navbar/ui';
-import { AddUserForm } from './AddUserForm';
+import { useState } from 'react';
 import { useGlobalStore } from '../../../shared/stores/globalstore';
-
-type UserStatus = 'Active' | 'Inactive';
-type UserRole = 'Administrator' | 'Supervisor' | 'Operator' | 'Technician';
-
-type UserItem = {
-    firstName: string;
-    lastName: string;
-    email: string;
-    role: UserRole;
-    status: UserStatus;
-};
-
-// payload mínimo esperado desde AddUserForm
-type AddUserPayload = {
-    firstName: string;
-    lastName: string;
-    email: string;
-    position?: string; // por compat con tu form anterior
-    role?: UserRole;
-    status?: UserStatus;
-};
+import { Chip, SectionCard } from '../navbar/ui';
+import { AddUserForm } from './AddUserForm';
 
 export function UsersSection() {
     const [showAddUser, setShowAddUser] = useState(false);
     const { profiles } = useGlobalStore();
-
-    const handleAddUser = (formData: AddUserPayload) => {
-        // defaults si tu AddUserForm no retorna role/status
-        const role: UserRole = formData.role ?? 'Operator';
-        const status: UserStatus = formData.status ?? 'Active';
-
-        const newUser: UserItem = {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            email: formData.email,
-            role,
-            status,
-        };
-
-        /*    setUsers((prev) => [...prev, newUser]); */
-        setShowAddUser(false);
-    };
 
     return (
         <div className="flex flex-col gap-8">
@@ -58,21 +20,15 @@ export function UsersSection() {
                 <div className="mt-6">
                     <div className="flex items-center justify-between mb-3">
                         <p className="font-medium">Active Users</p>
-                        {!showAddUser && (
-                            <button
-                                className="h-9 rounded-md bg-[#1E6B8F] text-white px-4 text-sm hover:bg-[#155972]"
-                                onClick={() => setShowAddUser(true)}
-                            >
-                                Add User
-                            </button>
-                        )}
+                        <button
+                            className="h-9 rounded-md bg-[#1E6B8F] text-white px-4 text-sm hover:bg-[#155972]"
+                            onClick={() => setShowAddUser(true)}
+                        >
+                            Add User
+                        </button>
                     </div>
 
-                    {showAddUser && (
-                        <div className="mb-4">
-                            <AddUserForm onAddUser={handleAddUser} onCancel={() => setShowAddUser(false)} />
-                        </div>
-                    )}
+                    <AddUserForm open={showAddUser} onClose={() => setShowAddUser(false)} />
 
                     <div className="rounded-xl border border-gray-200 bg-white divide-y">
                         {profiles.map((u, idx) => (
