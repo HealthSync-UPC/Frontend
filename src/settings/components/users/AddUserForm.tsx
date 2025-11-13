@@ -1,19 +1,28 @@
-import { useState } from 'react';
 
-interface User {
+import { useState } from 'react';
+import { UserService } from '../../services/userService';
+import { User as UserModel } from '../../model/User';
+import { useGlobalStore } from '../../../shared/stores/globalstore';
+
+
+const userService = new UserService();
+
+interface AddUserFormValues {
     firstName: string;
     lastName: string;
     position: string;
     email: string;
+    password: string;
 }
 
 interface AddUserFormProps {
-    onAddUser: (user: User) => void;
+
+    onAddUser?: (user: UserModel) => void;
     onCancel: () => void;
 }
 
 export function AddUserForm({ onAddUser, onCancel }: AddUserFormProps) {
-    const [form, setForm] = useState({
+    const [form, setForm] = useState<AddUserFormValues>({
         firstName: '',
         lastName: '',
         position: '',
@@ -21,20 +30,55 @@ export function AddUserForm({ onAddUser, onCancel }: AddUserFormProps) {
         password: '',
     });
 
+    const { jwt } = useGlobalStore();
+    const [loading, setLoading] = useState(false);
+
     const onChange = (k: keyof typeof form) =>
         (e: React.ChangeEvent<HTMLInputElement>) =>
             setForm((s) => ({ ...s, [k]: e.target.value }));
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         const { firstName, lastName, position, email, password } = form;
         if (!firstName || !lastName || !position || !email || !password) {
             alert('Complete all fields');
             return;
         }
-        
-        onAddUser({ firstName, lastName, position, email });
-        setForm({ firstName: '', lastName: '', position: '', email: '', password: '' });
-        onCancel(); // Close the form after adding
+
+        try {
+            setLoading(true);
+
+            const newUser = new UserModel(
+                firstName,
+                lastName,
+                email,
+                '',
+                password,
+                position
+            );
+
+            const response = await userService.create(newUser);
+            const created = (response as any).data ?? response;
+
+
+            if (onAddUser) {
+                onAddUser(created);
+            }
+
+
+            setForm({
+                firstName: '',
+                lastName: '',
+                position: '',
+                email: '',
+                password: '',
+            });
+            onCancel();
+        } catch (err) {
+            console.error(err);
+            alert('Ocurrió un error al crear el usuario');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -48,7 +92,7 @@ export function AddUserForm({ onAddUser, onCancel }: AddUserFormProps) {
                     ×
                 </button>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label className="block text-sm font-medium text-[#67737C] mb-1">
@@ -61,7 +105,7 @@ export function AddUserForm({ onAddUser, onCancel }: AddUserFormProps) {
                         className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00648E] focus:border-transparent"
                     />
                 </div>
-                
+
                 <div>
                     <label className="block text-sm font-medium text-[#67737C] mb-1">
                         Last Name
@@ -73,7 +117,7 @@ export function AddUserForm({ onAddUser, onCancel }: AddUserFormProps) {
                         className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00648E] focus:border-transparent"
                     />
                 </div>
-                
+
                 <div>
                     <label className="block text-sm font-medium text-[#67737C] mb-1">
                         Position
@@ -85,7 +129,7 @@ export function AddUserForm({ onAddUser, onCancel }: AddUserFormProps) {
                         className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00648E] focus:border-transparent"
                     />
                 </div>
-                
+
                 <div>
                     <label className="block text-sm font-medium text-[#67737C] mb-1">
                         Email
@@ -97,8 +141,12 @@ export function AddUserForm({ onAddUser, onCancel }: AddUserFormProps) {
                         onChange={onChange('email')}
                         className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00648E] focus:border-transparent"
                     />
+                    <label>
+                        {jwt?.sub?.toString()}
+                    </label>
+
                 </div>
-                
+
                 <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-[#67737C] mb-1">
                         Password
@@ -117,14 +165,16 @@ export function AddUserForm({ onAddUser, onCancel }: AddUserFormProps) {
                 <button
                     onClick={onCancel}
                     className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                    disabled={loading}
                 >
                     Cancel
                 </button>
                 <button
                     onClick={handleSubmit}
-                    className="bg-[#00648E] text-white py-2 px-6 rounded-md hover:bg-[#005273] transition-colors"
+                    className="bg-[#00648E] text-white py-2 px-6 rounded-md hover:bg-[#005273] transition-colors disabled:opacity-60"
+                    disabled={loading}
                 >
-                    Add User
+                    {loading ? 'Saving...' : 'Add User'}
                 </button>
             </div>
         </div>

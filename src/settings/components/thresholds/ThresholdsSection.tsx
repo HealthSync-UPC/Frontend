@@ -39,7 +39,7 @@ export function ThresholdsSection() {
     const handleUpdateThreshold = () => {
         if (Number.isNaN(tempForm.min) || Number.isNaN(tempForm.max)) return;
         if (tempForm.min > tempForm.max) {
-            alert('Min cannot be greater than Max');
+
             return;
         }
         setTemp((prev) =>
@@ -47,7 +47,7 @@ export function ThresholdsSection() {
                 t.title === selectedTemp ? { ...t, min: tempForm.min, max: tempForm.max } : t
             )
         );
-        alert('Temperature threshold updated (mock)');
+
     };
 
     const handleAddLocation = () => {
@@ -56,19 +56,19 @@ export function ThresholdsSection() {
         const max = Number(newLoc.max);
 
         if (!title) {
-            alert('Please enter a location name');
+
             return;
         }
         if (Number.isNaN(min) || Number.isNaN(max)) {
-            alert('Please enter numeric min/max');
+
             return;
         }
         if (min > max) {
-            alert('Min cannot be greater than Max');
+
             return;
         }
         if (temp.some((t) => t.title.toLowerCase() === title.toLowerCase())) {
-            alert('Location already exists');
+
             return;
         }
 
@@ -81,7 +81,6 @@ export function ThresholdsSection() {
         setNewLoc({ title: '', min: '', max: '' });
         setShowAddLoc(false);
 
-        alert('Location added (mock)');
     };
 
     // ---- Humidity state ----
@@ -93,7 +92,7 @@ export function ThresholdsSection() {
 
     const saveThresholds = () => {
         console.log('Saving thresholds (mock):', { temp, humidity });
-        alert('Thresholds saved (mock)');
+
     };
 
     return (
@@ -269,14 +268,6 @@ export function ThresholdsSection() {
                 </div>
             </SectionCard>
 
-            <div className="flex justify-end">
-                <button
-                    onClick={saveThresholds}
-                    className="h-10 px-8 rounded-md bg-[#00648E] text-white text-sm hover:bg-[#005273]"
-                >
-                    Save Thresholds (mock)
-                </button>
-            </div>
         </div>
     );
 }
