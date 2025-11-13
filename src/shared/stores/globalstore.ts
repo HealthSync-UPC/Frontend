@@ -3,6 +3,8 @@ import { immer } from "zustand/middleware/immer";
 import { User } from "../../iam/model/user";
 import { VerifyTotpRequest } from "../../iam/model/verify-totp-request";
 import { authService } from "../../iam/services/user-services";
+import type { JwtPayload } from "jwt-decode";
+import { getTokenData } from "../utils/jwt-decode";
 
 
 interface GlobalState {
@@ -13,6 +15,7 @@ interface GlobalState {
     login: () => Promise<"200" | "202" | "error">;
     qrCode?: string;
     verifyCode: (code: number) => Promise<boolean>;
+    jwt: JwtPayload | null;
 }
 
 export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
@@ -66,8 +69,8 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
 
             if (response.data) {
                 const token = response.data.token;
-                console.log("Token recibido:", token);
-                sessionStorage.setItem("token", token);
+                localStorage.setItem("token", token);
+                set(state => { state.jwt = getTokenData(token); });
             }
 
             return response.status == 200;
@@ -75,5 +78,6 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
             console.error("Error during code verification:", error);
             return false;
         }
-    }
+    },
+    jwt: null
 })));
