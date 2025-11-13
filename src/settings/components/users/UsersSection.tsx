@@ -2,6 +2,7 @@ import { useState } from 'react';
 import GroupIcon from '@mui/icons-material/Group';
 import { Badge, Chip, SectionCard } from '../navbar/ui';
 import { AddUserForm } from './AddUserForm';
+import { useGlobalStore } from '../../../shared/stores/globalstore';
 
 type UserStatus = 'Active' | 'Inactive';
 type UserRole = 'Administrator' | 'Supervisor' | 'Operator' | 'Technician';
@@ -26,13 +27,7 @@ type AddUserPayload = {
 
 export function UsersSection() {
     const [showAddUser, setShowAddUser] = useState(false);
-
-    const [users, setUsers] = useState<UserItem[]>([
-        { firstName: 'Dr. John', lastName: 'Smith', email: 'j.smith@hospital.com', role: 'Administrator', status: 'Active' },
-        { firstName: 'Nurse Jane', lastName: 'Doe', email: 'j.doe@hospital.com', role: 'Operator', status: 'Active' },
-        { firstName: 'Tech Mike', lastName: 'Johnson', email: 'm.johnson@hospital.com', role: 'Technician', status: 'Inactive' },
-        { firstName: 'Supervisor Anna', lastName: 'Wilson', email: 'a.wilson@hospital.com', role: 'Supervisor', status: 'Active' },
-    ]);
+    const { profiles } = useGlobalStore();
 
     const handleAddUser = (formData: AddUserPayload) => {
         // defaults si tu AddUserForm no retorna role/status
@@ -47,7 +42,7 @@ export function UsersSection() {
             status,
         };
 
-        setUsers((prev) => [...prev, newUser]);
+        /*    setUsers((prev) => [...prev, newUser]); */
         setShowAddUser(false);
     };
 
@@ -80,15 +75,15 @@ export function UsersSection() {
                     )}
 
                     <div className="rounded-xl border border-gray-200 bg-white divide-y">
-                        {users.map((u, idx) => (
+                        {profiles.map((u, idx) => (
                             <div key={`${u.email}-${idx}`} className="flex items-center justify-between px-4 py-4">
                                 <div className="min-w-0">
                                     <p className="font-medium truncate">{u.firstName} {u.lastName}</p>
                                     <p className="text-sm text-[#67737C] truncate">{u.email}</p>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <Badge status={u.status} />
-                                    <Chip>{u.role}</Chip>
+                                    {/*      <Badge status={u} /> */}
+                                    <Chip>{u.position}</Chip>
                                     <button className="h-8 rounded-md border border-gray-300 px-3 text-sm hover:bg-gray-50">Edit</button>
                                 </div>
                             </div>

@@ -134,17 +134,17 @@ export function AddUserForm({ onAddUser, onCancel }: AddUserFormProps) {
                     <label className="block text-sm font-medium text-[#67737C] mb-1">
                         Email
                     </label>
-                    <input
-                        placeholder="Enter email"
-                        type="email"
-                        value={form.email}
-                        onChange={onChange('email')}
-                        className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00648E] focus:border-transparent"
-                    />
-                    <label>
-                        {jwt?.sub?.toString()}
-                    </label>
 
+                    <div className="flex items-center border rounded px-3 py-2 focus-within:ring-2 focus-within:ring-[#00648E] focus-within:border-transparent">
+                        <input
+                            placeholder="enter mail"
+                            type="text"
+                            value={form.email}
+                            onChange={onChange('email')}
+                            className="w-full outline-none"
+                        />
+                        <span className="text-gray-500 ml-1">@mail.com</span>
+                    </div>
                 </div>
 
                 <div className="md:col-span-2">
