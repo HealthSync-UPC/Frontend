@@ -6,11 +6,9 @@
 export class Createreading {
   deviceId: number;
   value: string;
-  numericValue: number;
 
-  constructor(deviceId: number, value: string, numericValue: number) {
+  constructor(deviceId: number, value: string) {
     this.deviceId = deviceId;
     this.value = value;
-    this.numericValue = numericValue;
   }
 }
