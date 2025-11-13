@@ -6,10 +6,13 @@ import WarningIcon from "@mui/icons-material/Warning";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import ArticleIcon from "@mui/icons-material/Article";
 import SettingsIcon from "@mui/icons-material/Settings";
+import { useEffect } from "react";
+import { useGlobalStore } from "../stores/globalstore";
 
 export function MainLayout() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { getProfiles } = useGlobalStore();
 
     const menuItems = [
         { icon: <DashboardIcon />, label: "Dashboard", path: "/dashboard" },
@@ -23,6 +26,10 @@ export function MainLayout() {
     const bottomItems = [
         { icon: <SettingsIcon />, label: "Settings", path: "/settings" },
     ];
+
+    useEffect(() => {
+        getProfiles();
+    }, [])
 
     return (
         <div className="flex flex-col w-full h-screen">

@@ -1,0 +1,19 @@
+import http from "../../shared/services/http";
+import type { User } from "../model/User";
+
+export class UserService {
+    private endpoint = import.meta.env.VITE_API_BASE_URL + '/profiles';
+
+    async create(profile: User) {
+        return await http.post<User>(this.endpoint, profile);
+    }
+    async getprofile() {
+        return await http.get<User>(this.endpoint);
+    }
+    async getAllProfiles() {
+        return await http.get<User[]>(this.endpoint + "/all");
+    }
+
+}
+
+export const profileService = new UserService();
