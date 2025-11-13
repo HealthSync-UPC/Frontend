@@ -1,15 +1,26 @@
 import { Navigate, Route, Routes } from "react-router"
-
-import AuthPages from "./iam/pages/AuthPages"
-import { RegisterForm } from "./iam/components/RegisterForm"
-import { Qrimg } from "./iam/components/Qrimg"
 import { CodeAuth } from "./iam/components/CodeAuth"
 import { LoginForm } from "./iam/components/LoginForm"
-import { MainLayout } from "./shared/pages/MainLayout"
+import { Qrimg } from "./iam/components/Qrimg"
+import { RegisterForm } from "./iam/components/RegisterForm"
+import AuthPages from "./iam/pages/AuthPages"
+import { PrivateRoute } from "./shared/pages/PrivateRoute"
 import { DashboardPage } from "./dashboard/pages/DashboardPage"
 import { IoTPage } from "./iot/pages/IoTPage"
+import SettingsPage from "./settings/pages/SettingsPage"
+import { useGlobalStore } from "./shared/stores/globalstore"
+import { useEffect } from "react"
 
 function App() {
+  const { setJwt } = useGlobalStore();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setJwt(token);
+    }
+  }, []);
+
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/login" />} />
@@ -20,16 +31,15 @@ function App() {
         <Route path="/setup-mfa" element={<Qrimg />} />
       </Route>
 
-      <Route element={<MainLayout />}>
+      <Route element={<PrivateRoute />}>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/devices" element={<IoTPage />} />
         <Route path="/monitoring" element={<p>Monitoring</p>} />
         <Route path="/alerts" element={<p>Alerts</p>} />
         <Route path="/inventory" element={<p>Inventory</p>} />
         <Route path="/report" element={<p>Report</p>} />
-        <Route path="/settings" element={<p>Settings</p>} />
+        <Route path="/settings" element={<SettingsPage />} />
       </Route>
-
     </Routes>
   )
 
