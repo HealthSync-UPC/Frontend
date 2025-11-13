@@ -7,6 +7,9 @@ import type { JwtPayload } from "jwt-decode";
 import { getTokenData } from "../utils/jwt-decode";
 import { User as Profile } from "../../settings/model/User";
 import { profileService } from "../../settings/services/userService";
+import type { Iot } from "../../iot/model/iot";
+import type { Createreading } from "../../iot/model/createreading";
+import { iotService } from "../../iot/services/iot-services";
 interface GlobalState {
     // IAM
     user: User;
@@ -17,6 +20,13 @@ interface GlobalState {
     verifyCode: (code: number) => Promise<boolean>;
     jwt: JwtPayload | null;
     setJwt: (token: string) => void;
+
+    // IoT
+    devices: Iot[];
+    getDevices: () => Promise<void>;
+    createDevice: (iot: Iot) => Promise<void>;
+    createDeviceReading: (reading: Createreading) => Promise<void>;
+    deleteDevice: (iot: Iot) => Promise<void>;
 
     // Settings
     profiles: Profile[],
@@ -91,6 +101,66 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
         set(state => {
             state.jwt = getTokenData(token);
         });
+    },
+    // IoT
+    devices: [],
+    getDevices: async () => {
+        try {
+            const response = await iotService.getDevices();
+            if (response.data) {
+                set(state => {
+                    state.devices = response.data;
+                });
+                console.log("Fetched devices:", response.data);
+            }
+        } catch (error) {
+            console.error("Error fetching devices:", error);
+        }
+    },
+    createDevice: async (iot: Iot) => {
+        try {
+            const response = await iotService.createDevice(iot);
+            if (response.data) {
+                set(state => {
+                    state.devices.push(response.data!);
+                });
+                console.log("Created device:", response.data);
+            }
+        } catch (error) {
+            console.error("Error creating device:", error);
+        }
+    },
+    createDeviceReading: async (reading: Createreading) => {
+        try {
+            const response = await iotService.createDeviceReading(reading);
+
+            if (response.data) {
+                const updatedDevice = response.data;
+                const updatedDevices = get().devices.map(device =>
+                    device.id === updatedDevice.id ? updatedDevice : device
+                );
+                set(state => {
+                    state.devices = updatedDevices;
+                });
+                console.log("Created device reading:", response.data);
+            }
+
+        } catch (error) {
+            console.error("Error creating device reading:", error);
+        }
+    },
+    deleteDevice: async (iot: Iot) => {
+        try {
+            const response = await iotService.deleteDevice(iot);
+            if (response.status == 204) {
+                set(state => {
+                    state.devices = state.devices.filter(device => device.id !== iot.id);
+                });
+                console.log(`Deleted device with id: ${iot.id}`);
+            }
+        } catch (error) {
+            console.error("Error deleting device:", error);
+        }
     },
     // Settings
     profiles: [],
