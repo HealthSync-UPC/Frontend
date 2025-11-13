@@ -10,8 +10,10 @@ export class UserService {
     async getprofile() {
         return await http.get<User>(this.endpoint);
     }
-    async createall(profile: User) {
-        return await http.post<User>(this.endpoint + "/all", profile);
+    async getAllProfiles() {
+        return await http.get<User[]>(this.endpoint + "/all");
     }
 
 }
+
+export const profileService = new UserService();

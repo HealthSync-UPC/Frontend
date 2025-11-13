@@ -5,8 +5,8 @@ import { VerifyTotpRequest } from "../../iam/model/verify-totp-request";
 import { authService } from "../../iam/services/user-services";
 import type { JwtPayload } from "jwt-decode";
 import { getTokenData } from "../utils/jwt-decode";
-
-
+import { User as Profile } from "../../settings/model/User";
+import { profileService } from "../../settings/services/userService";
 interface GlobalState {
     // IAM
     user: User;
@@ -16,9 +16,14 @@ interface GlobalState {
     qrCode?: string;
     verifyCode: (code: number) => Promise<boolean>;
     jwt: JwtPayload | null;
+
+    // Settings
+    profiles: Profile[],
+    getProfiles: () => Promise<void>;
 }
 
 export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
+    // IAM
     user: new User("", "", ""),
     setUser: (user: Partial<User>) => set((state) => {
         state.user = Object.assign(new User("", "", ""), { ...state.user, ...user });
@@ -79,5 +84,22 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
             return false;
         }
     },
-    jwt: null
+    jwt: null,
+
+    // Settings
+    profiles: [],
+    getProfiles: async () => {
+        try {
+            const response = await profileService.getAllProfiles();
+            if (response.data) {
+                set(state => {
+                    state.profiles = response.data;
+                });
+
+                console.log("Fetched profiles:", response.data);
+            }
+        } catch (error) {
+            console.error("Error fetching profiles:", error);
+        }
+    }
 })));
