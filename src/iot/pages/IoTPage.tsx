@@ -11,6 +11,7 @@ import { AddDeviceModal } from '../components/AddDeviceModal';
 import { ReadingsModal } from '../components/ReadingsModal';
 import { useGlobalStore } from '../../shared/stores/globalstore';
 import type { Iot } from '../model/iot';
+import { AddReadingModal } from '../components/AddReadingModal';
 
 export function IoTPage() {
     const { devices } = useGlobalStore();
@@ -18,6 +19,7 @@ export function IoTPage() {
     const [openModal, setOpenModal] = useState(false);
     const [openReadings, setOpenReadings] = useState(false);
     const [selectedDevice, setSelectedDevice] = useState<Iot | null>(null);
+    const [openAddReading, setOpenAddReading] = useState(false);
 
     const totalDevices = devices.length;
     const onlineCount = devices.filter(device => device.status === 'ONLINE').length;
@@ -90,6 +92,10 @@ export function IoTPage() {
             <TableIoT
                 devices={devices}
                 onViewReadings={handleViewReadings}
+                onAddReading={(device) => {
+                    setSelectedDevice(device);
+                    setOpenAddReading(true);
+                }}
             />
 
             {/* Modal para crear device */}
@@ -102,6 +108,12 @@ export function IoTPage() {
             <ReadingsModal
                 open={openReadings}
                 onClose={() => setOpenReadings(false)}
+                device={selectedDevice}
+            />
+
+            <AddReadingModal
+                open={openAddReading}
+                onClose={() => setOpenAddReading(false)}
                 device={selectedDevice}
             />
         </div>

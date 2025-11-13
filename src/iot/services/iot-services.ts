@@ -14,7 +14,7 @@ export class IotService {
     }
 
     async createDeviceReading(createreading: Createreading) {
-        return await http.post<Iot>(this.endpoint, createreading);
+        return await http.post<Iot>(this.endpoint + '/readings', createreading);
     }
 
     async deleteDevice(iot: Iot) {
