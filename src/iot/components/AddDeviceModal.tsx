@@ -68,7 +68,6 @@ export function AddDeviceModal({ open, onClose }: AddDeviceFormProps) {
         const { name, serialNumber, type, location, status, unit } = form;
 
         if (!name || !serialNumber || !type || !location || !status) {
-            alert('Complete all fields');
             return;
         }
 
@@ -102,7 +101,6 @@ export function AddDeviceModal({ open, onClose }: AddDeviceFormProps) {
             onClose();
         } catch (err) {
             console.error(err);
-            alert('Ocurrió un error al crear el dispositivo');
         } finally {
             setLoading(false);
         }
