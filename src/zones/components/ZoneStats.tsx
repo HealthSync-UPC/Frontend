@@ -4,7 +4,6 @@ import MemoryOutlinedIcon from '@mui/icons-material/MemoryOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import type { ReactNode } from 'react';
 
-/** Card base solo para esta página */
 const Card = ({ children, className = '' }: { children: ReactNode; className?: string }) => (
     <div className={`rounded-xl border border-gray-200 bg-white p-5 ${className}`}>{children}</div>
 );

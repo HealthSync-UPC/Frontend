@@ -2,11 +2,15 @@ import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 import type { ReactNode } from 'react';
 
-/** Tipos que se usan tanto aquí como en la page */
-export type ZoneRow = { name: string; devices: number; items: number; members: number };
-export type AccessRow = { user: string; when: string; status: 'granted' | 'denied' };
+export type ZoneRow = { id: number; name: string; devices: number; items: number; members: number };
 
-/* ========== helpers UI locales ========== */
+export type AccessRow = {
+    user: string;
+    when: string;
+    status: 'granted' | 'denied';
+    location: string;
+    daysAgo: number;
+};
 
 const Card = ({ children, className = '' }: { children: ReactNode; className?: string }) => (
     <div className={`rounded-xl border border-gray-200 bg-white p-5 ${className}`}>{children}</div>
@@ -30,9 +34,13 @@ const AccessBadge = ({ type }: { type: 'granted' | 'denied' }) => {
     );
 };
 
-/* ========== subcomponentes ========== */
-
-function ZoneTable({ zones }: { zones: ZoneRow[] }) {
+function ZoneTable({
+    zones,
+    onViewZone,
+}: {
+    zones: ZoneRow[];
+    onViewZone: (zone: ZoneRow) => void;
+}) {
     return (
         <Card className="xl:col-span-2">
             <div className="mb-1 flex items-end justify-between">
@@ -55,7 +63,7 @@ function ZoneTable({ zones }: { zones: ZoneRow[] }) {
                     </thead>
                     <tbody className="divide-y">
                         {zones.map((z) => (
-                            <tr key={z.name} className="align-middle">
+                            <tr key={z.id} className="align-middle">
                                 <td className="py-4 pr-4">
                                     <div className="flex items-center gap-2">
                                         <PlaceOutlinedIcon fontSize="small" className="text-gray-500" />
@@ -72,7 +80,10 @@ function ZoneTable({ zones }: { zones: ZoneRow[] }) {
                                     <CountPill n={z.members} />
                                 </td>
                                 <td className="py-4 pr-2">
-                                    <button className="rounded-md border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50">
+                                    <button
+                                        onClick={() => onViewZone(z)}
+                                        className="rounded-md border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50"
+                                    >
                                         View
                                     </button>
                                 </td>
@@ -101,6 +112,10 @@ function RecentAccess({ access }: { access: AccessRow[] }) {
             </div>
 
             <div className="flex flex-col gap-3">
+                {access.length === 0 && (
+                    <p className="text-sm text-gray-500">No access events match the selected filters.</p>
+                )}
+
                 {access.map((a, idx) => (
                     <div
                         key={idx}
@@ -118,12 +133,18 @@ function RecentAccess({ access }: { access: AccessRow[] }) {
     );
 }
 
-/* ========== componente principal de la sección ========== */
-
-export function ZoneMainSection({ zones, access }: { zones: ZoneRow[]; access: AccessRow[] }) {
+export function ZoneMainSection({
+    zones,
+    access,
+    onViewZone,
+}: {
+    zones: ZoneRow[];
+    access: AccessRow[];
+    onViewZone: (zone: ZoneRow) => void;
+}) {
     return (
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-            <ZoneTable zones={zones} />
+            <ZoneTable zones={zones} onViewZone={onViewZone} />
             <RecentAccess access={access} />
         </div>
     );
