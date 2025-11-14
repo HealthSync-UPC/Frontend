@@ -142,8 +142,8 @@ export function ItemsCard({ filters }: { filters: Filters }) {
 
                                     <td className="py-4 pr-2">
                                         <div className="flex gap-2">
-                                            <ActionButton onClick={() => alert(`Viewing ${i.id}`)}>View</ActionButton>
-                                            <ActionButton onClick={() => alert(`Updating ${i.id}`)}>Update</ActionButton>
+                                            <ActionButton onClick={() => { }}>View</ActionButton>
+                                            <ActionButton onClick={() => { }}>Update</ActionButton>
                                         </div>
                                     </td>
                                 </tr>

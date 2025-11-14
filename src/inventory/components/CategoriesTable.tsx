@@ -40,13 +40,13 @@ export function CategoriesTable() {
                                 <td className="py-4 pr-2">
                                     <div className="flex gap-2">
                                         <button
-                                            onClick={() => alert(`Viewing category ${c.id}`)}
+                                            onClick={() => { }}
                                             className="h-9 rounded-md border border-gray-300 px-4 text-sm hover:bg-gray-50"
                                         >
                                             View
                                         </button>
                                         <button
-                                            onClick={() => alert(`Updating category ${c.id}`)}
+                                            onClick={() => { }}
                                             className="h-9 rounded-md border border-gray-300 px-4 text-sm hover:bg-gray-50"
                                         >
                                             Update

@@ -17,7 +17,6 @@ export function InventoryPage() {
 
     const handleExport = () => {
         console.log('Exporting CSV…');
-        alert('Exported (mock CSV)');
     };
 
     return (
