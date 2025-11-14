@@ -33,11 +33,11 @@ interface GlobalState {
 
     //Inventory
     categories: Category[];
-    /* items: Item[]; */
+    items: Item[];
     getCategories: () => Promise<void>;
     addCategory: (category: Category) => Promise<void>;
     deleteCategory: (category: Category) => Promise<void>;
-    /* getItems: () => Promise<void>; */
+    getItems: () => Promise<void>;
     addItem: (item: Item) => Promise<void>;
     deleteItem: (item: Item) => Promise<void>;
 
@@ -178,8 +178,8 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
     },
 
     // Inventory
-    /* items: [], */
     categories: [],
+    items: [],
     getCategories: async () => {
         try {
             const response = await inventoryService.getCategories();
@@ -220,7 +220,7 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
             console.error("Error deleting category:", error);
         }
     },
-    /* getItems: async () => {
+    getItems: async () => {
         try {
             const response = await inventoryService.getItems();
 
@@ -233,7 +233,7 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
         } catch (error) {
             console.error("Error fetching items:", error);
         }
-    }, */
+    },
     addItem: async (item: Item) => {
         try {
             const response = await inventoryService.addItem(item);
@@ -251,6 +251,9 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
 
                 set(state => {
                     state.categories = updatedCategories;
+                });
+                set(state => {
+                    state.items.push(newItem);
                 });
                 console.log("Added item:", response.data);
             }
@@ -274,6 +277,9 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
                 });
                 set(state => {
                     state.categories = updatedCategories;
+                });
+                set(state => {
+                    state.items = state.items.filter(it => it.id !== item.id);
                 });
                 console.log(`Deleted item with id: ${item.id}`);
             }

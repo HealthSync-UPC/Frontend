@@ -11,8 +11,7 @@ type Props = {
 export function AddItemModal({ open, onClose }: Props) {
     const { categories, addItem } = useGlobalStore();
 
-    const [form, setForm] = useState<Item>({
-        id: 0,
+    const [form, setForm] = useState<Omit<Item, "id" | "categoryName">>({
         categoryId: 0,
         name: "",
         code: "",
@@ -21,6 +20,7 @@ export function AddItemModal({ open, onClose }: Props) {
         unit: "",
         active: true,
         location: "",
+        expirationDate: undefined
     });
 
     const firstFieldRef = useRef<HTMLInputElement>(null);
@@ -50,9 +50,9 @@ export function AddItemModal({ open, onClose }: Props) {
 
         await addItem({
             ...form,
-            id: Date.now(),
-            quantity: Number(form.quantity)
-        });
+            quantity: Number(form.quantity),
+            expirationDate: form.expirationDate ? new Date(form.expirationDate) : undefined
+        } as Item);
 
         onClose();
     };
@@ -165,6 +165,22 @@ export function AddItemModal({ open, onClose }: Props) {
                             placeholder="e.g., Storage Room A"
                             value={form.location}
                             onChange={(e) => setForm({ ...form, location: e.target.value })}
+                        />
+                    </div>
+
+                    {/* Expiration Date (optional) */}
+                    <div>
+                        <label className="block text-sm font-medium">Expiration Date (optional)</label>
+                        <input
+                            type="date"
+                            className="mt-1 h-10 w-full rounded-md border border-gray-300 px-3"
+                            value={form.expirationDate ? form.expirationDate.toString().substring(0, 10) : ""}
+                            onChange={(e) =>
+                                setForm({
+                                    ...form,
+                                    expirationDate: e.target.value ? new Date(e.target.value) : undefined
+                                })
+                            }
                         />
                     </div>
 

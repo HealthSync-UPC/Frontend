@@ -1,36 +1,23 @@
-import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined';
 import AddIcon from '@mui/icons-material/Add';
+import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined';
 import { useState } from 'react';
-import type { Filters, InventoryItem } from '../model/types';
-import { SummaryCards } from '../components/SummaryCards';
-import { FiltersCard } from '../components/FiltersCard';
-import { ItemsCard } from '../components/ItemsCard';
+import { AddCategoryModal } from '../components/AddCategoryModal';
 import { AddItemModal } from '../components/AddItemModal';
+import { CategoriesTable } from '../components/CategoriesTable';
+import { ItemsTable } from '../components/ItemsTable';
+import type { Filters } from '../components/FiltersCard';
 
-// Mock inicial
-const INITIAL: InventoryItem[] = [
-    { id: 'INV-001', name: 'Insulin Humalog', category: 'Medications', batch: 'HUM2024-A', expiryDate: '2024-11-15', quantity: 45, unitLabel: 'vials', location: 'Pharmacy Cold Storage A' },
-    { id: 'INV-002', name: 'COVID-19 Vaccine', category: 'Vaccines', batch: 'COV2024-B12', expiryDate: '2024-10-25', quantity: 1200, unitLabel: 'doses', location: 'Laboratory Refrigerator' },
-    { id: 'INV-003', name: 'Blood Plasma Type O+', category: 'Blood Products', batch: 'BP2024-015', expiryDate: '2024-10-08', quantity: 12, unitLabel: 'units', location: 'Blood Bank Storage' },
-    { id: 'INV-004', name: 'Surgical Masks N95', category: 'PPE', batch: 'N95-2024-C', expiryDate: '2025-06-30', quantity: 250, unitLabel: 'pieces', location: 'Storage Room C' },
-    { id: 'INV-005', name: 'Antibiotics Amoxicillin', category: 'Medications', batch: 'AMX2024-D', expiryDate: '2024-10-03', quantity: 0, unitLabel: 'boxes', location: 'Pharmacy Cold Storage A' },
-];
+type InventoryTab = "items" | "categories";
 
 export function InventoryPage() {
-    const [items, setItems] = useState<InventoryItem[]>(INITIAL);
     const [filters, setFilters] = useState<Filters>({ query: '', category: 'All', location: 'All' });
-    const [openAdd, setOpenAdd] = useState(false);
+    const [openAddItem, setOpenAddItem] = useState(false);
+    const [openAddCategory, setOpenAddCategory] = useState(false);
+    const [tab, setTab] = useState<InventoryTab>("items");
 
     const handleExport = () => {
-        console.log('Exporting CSV…', items);
+        console.log('Exporting CSV…');
         alert('Exported (mock CSV)');
-    };
-
-    const nextId = `INV-${String(items.length + 1).padStart(3, '0')}`;
-
-    const handleSubmitNew = (item: InventoryItem) => {
-        setItems((prev) => [item, ...prev]);
-        setOpenAdd(false);
     };
 
     return (
@@ -51,7 +38,14 @@ export function InventoryPage() {
                         Export
                     </button>
                     <button
-                        onClick={() => setOpenAdd(true)}
+                        onClick={() => setOpenAddCategory(true)}
+                        className="inline-flex items-center gap-2 h-10 px-4 rounded-md bg-[#1E4288] text-white hover:bg-[#163568]"
+                    >
+                        <AddIcon fontSize="small" />
+                        Add Category
+                    </button>
+                    <button
+                        onClick={() => setOpenAddItem(true)}
                         className="inline-flex items-center gap-2 h-10 px-4 rounded-md bg-[#1E4288] text-white hover:bg-[#163568]"
                     >
                         <AddIcon fontSize="small" />
@@ -60,13 +54,39 @@ export function InventoryPage() {
                 </div>
             </div>
 
-            {/* Cards, filtros y tabla */}
-            <SummaryCards items={items} />
-            <FiltersCard filters={filters} onChange={setFilters} />
-            <ItemsCard items={items} filters={filters} />
+            {/* Tabs */}
+            <div className="rounded-full bg-gray-100 p-1 inline-flex gap-1">
+                <button
+                    onClick={() => setTab("items")}
+                    className={[
+                        "px-4 py-1.5 rounded-full text-sm",
+                        tab === "items" ? "bg-white shadow-sm" : "text-gray-600"
+                    ].join(" ")}
+                >
+                    Items
+                </button>
 
-            {/* Modal Add Item */}
-            <AddItemModal open={openAdd} onClose={() => setOpenAdd(false)} onSubmit={handleSubmitNew} nextId={nextId} />
+                <button
+                    onClick={() => setTab("categories")}
+                    className={[
+                        "px-4 py-1.5 rounded-full text-sm",
+                        tab === "categories" ? "bg-white shadow-sm" : "text-gray-600"
+                    ].join(" ")}
+                >
+                    Categories
+                </button>
+            </div>
+
+            {/* Content */}
+            {tab === "items" && (
+                <ItemsTable filters={filters} setFilters={setFilters} />
+            )}
+
+            {tab === "categories" && <CategoriesTable />}
+
+            {/* Modals */}
+            <AddItemModal open={openAddItem} onClose={() => setOpenAddItem(false)} />
+            <AddCategoryModal open={openAddCategory} onClose={() => setOpenAddCategory(false)} />
         </div>
     );
 }

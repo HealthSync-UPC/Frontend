@@ -12,7 +12,7 @@ import { useGlobalStore } from "../stores/globalstore";
 export function MainLayout() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { getDevices, getCategories, getProfiles } = useGlobalStore();
+    const { getDevices, getCategories, getItems, getProfiles } = useGlobalStore();
 
     const menuItems = [
         { icon: <DashboardIcon />, label: "Dashboard", path: "/dashboard" },
@@ -30,6 +30,7 @@ export function MainLayout() {
     useEffect(() => {
         getDevices();
         getCategories();
+        getItems();
         getProfiles();
     }, [])
 

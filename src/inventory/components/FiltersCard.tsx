@@ -1,18 +1,21 @@
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import SearchIcon from '@mui/icons-material/Search';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useGlobalStore } from '../../shared/stores/globalstore';
 import { SectionCard } from './ui';
-import type { Category, Filters, Location } from '../model/types';
 
-const CATEGORIES: Category[] = ['Medications', 'Vaccines', 'Blood Products', 'PPE'];
-const LOCATIONS: Location[] = ['Pharmacy Cold Storage A', 'Laboratory Refrigerator', 'Storage Room C', 'Blood Bank Storage'];
+export type Filters = {
+    query: string;
+    category: 'All' | string;
+    location: 'All' | string;
+};
 
-export function FiltersCard({
-    filters, onChange,
-}: {
-    filters: Filters;
-    onChange: (f: Filters) => void;
-}) {
+// TODO: Move locations to global store
+const LOCATIONS: any[] = ['Pharmacy Cold Storage A', 'Laboratory Refrigerator', 'Storage Room C', 'Blood Bank Storage'];
+
+export function FiltersCard({ filters, onChange, }: { filters: Filters; onChange: (f: Filters) => void; }) {
+    const { categories } = useGlobalStore();
+
     return (
         <SectionCard>
             <div className="flex items-center gap-2 mb-4">
@@ -40,7 +43,7 @@ export function FiltersCard({
                         className="h-10 w-full appearance-none rounded-md border border-gray-300 px-3 text-sm text-gray-700"
                     >
                         <option>All</option>
-                        {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                        {categories.map(c => <option key={c.name}>{c.name}</option>)}
                     </select>
                     <ExpandMoreIcon className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 </div>
