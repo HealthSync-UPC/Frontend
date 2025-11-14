@@ -2,119 +2,132 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import WifiIcon from '@mui/icons-material/Wifi';
 import WifiOffIcon from '@mui/icons-material/WifiOff';
+import WarningIcon from '@mui/icons-material/Warning';
+import type { Iot } from "../model/iot";
+import type { ReactNode } from "react";
 
-export function TableIoT() {
+interface TableIoTProps {
+    devices: Iot[];
+    onViewReadings: (device: Iot) => void;
+    onAddReading: (device: Iot) => void;   // ⬅️ nuevo callback
+}
+
+type StatusKey = "ONLINE" | "OFFLINE" | "WARNING";
+
+const statusUI: Record<StatusKey, {
+    icon: ReactNode;
+    bg: string;
+    text: string;
+    label: string;
+}> = {
+    ONLINE: {
+        icon: <WifiIcon className="text-[#00C950]" />,
+        bg: "bg-[#DCFCE7]",
+        text: "text-[#016630]",
+        label: "Online",
+    },
+    OFFLINE: {
+        icon: <WifiOffIcon className="text-[#DC2626]" />,
+        bg: "bg-[#FEE2E2]",
+        text: "text-[#B91C1C]",
+        label: "Offline",
+    },
+    WARNING: {
+        icon: <WarningIcon className="text-[#FACC15]" />,
+        bg: "bg-[#FEF9C3]",
+        text: "text-[#854D0E]",
+        label: "Warning",
+    },
+};
+
+const typeUI: Record<string, string> = {
+    TEMPERATURE: "Temperature",
+    HUMIDITY: "Humidity",
+    ACCESS_NFC: "Access NFC",
+};
+
+export function TableIoT({ devices, onViewReadings, onAddReading }: TableIoTProps) {
     return (
         <Card className="shadow-none border rounded-2xl bg-[#F9FCFF] border-[#DFE6EB]">
             <CardContent>
                 <div className="flex flex-col gap-4">
+
                     {/* Header */}
-                    <div className="flex flex-col justify-between items-start text-[#67737C]">
+                    <div className="flex flex-col items-start text-[#67737C]">
                         <p className="text-lg font-medium text-[#040C13]">Device Network Status</p>
                         <p>Real-time status of all registered IoT devices</p>
                     </div>
 
                     {/* Table */}
                     <div className="text-[#040C13] text-sm">
+
                         {/* Column titles */}
-                        <div className="flex justify-between font-medium border-b border-[#DFE6EB] pb-2 text-[#67737C]">
-                            <span className="w-[20%]">Device ID</span>
-                            <span className="w-[35%]">Name</span>
-                            <span className="w-[20%]">Type</span>
-                            <span className="w-[25%] text-right">Status</span>
+                        <div className="grid grid-cols-6 font-medium border-b border-[#DFE6EB] pb-2 text-[#67737C]">
+                            <span>ID</span>
+                            <span>Serial Number</span>
+                            <span>Name</span>
+                            <span>Type</span>
+                            <span className="text-right">Status</span>
+                            <span className="text-right">Readings</span>
                         </div>
 
-                        {/* Device rows */}
                         <div className="divide-y divide-[#DFE6EB] mt-2">
-                            {/* Row 1 */}
-                            <div className="flex justify-between items-center py-4">
-                                <span className="w-[20%] font-semibold">TEMP-001</span>
-                                <div className="w-[35%] flex flex-col">
-                                    <span>Cold Storage A Monitor</span>
-                                    <span className="text-[#67737C] text-xs">v2.1.4</span>
-                                </div>
-                                <div className="w-[20%] border border-[#DFE6EB] rounded-lg px-3 py-1 text-center">
-                                    Temperature
-                                </div>
-                                <div className="w-[25%] flex items-center justify-end gap-2">
-                                    <WifiIcon className="text-[#00C950]" />
-                                    <div className="bg-[#DCFCE7] rounded-lg px-3 py-1 text-[#016630] text-xs font-medium">
-                                        Online
-                                    </div>
-                                </div>
-                            </div>
+                            {devices.map((d) => {
+                                const statusKey = (d.status as StatusKey) || "OFFLINE";
+                                const st = statusUI[statusKey];
+                                const typeLabel = typeUI[d.type] ?? d.type;
 
-                            {/* Row 2 */}
-                            <div className="flex justify-between items-center py-4">
-                                <span className="w-[20%] font-semibold">HUM-002</span>
-                                <div className="w-[35%] flex flex-col">
-                                    <span>Storage Room Humidity Sensor</span>
-                                    <span className="text-[#67737C] text-xs">v1.8.2</span>
-                                </div>
-                                <div className="w-[20%] border border-[#DFE6EB] rounded-lg px-3 py-1 text-center">
-                                    Humidity
-                                </div>
-                                <div className="w-[25%] flex items-center justify-end gap-2">
-                                    <WifiIcon className="text-[#00C950]" />
-                                    <div className="bg-[#DCFCE7] rounded-lg px-3 py-1 text-[#016630] text-xs font-medium">
-                                        Online
-                                    </div>
-                                </div>
-                            </div>
+                                return (
+                                    <div key={d.id} className="grid grid-cols-6 items-center py-4">
 
-                            {/* Row 3 */}
-                            <div className="flex justify-between items-center py-4">
-                                <span className="w-[20%] font-semibold">DOOR-003</span>
-                                <div className="w-[35%] flex flex-col">
-                                    <span>Laboratory Fridge Door Monitor</span>
-                                    <span className="text-[#67737C] text-xs">v1.5.1</span>
-                                </div>
-                                <div className="w-[20%] border border-[#DFE6EB] rounded-lg px-3 py-1 text-center">
-                                    Door
-                                </div>
-                                <div className="w-[25%] flex items-center justify-end gap-2">
-                                    <WifiIcon className="text-[#FACC15]" />
-                                    <div className="bg-[#FEF9C3] rounded-lg px-3 py-1 text-[#854D0E] text-xs font-medium">
-                                        Warning
-                                    </div>
-                                </div>
-                            </div>
+                                        {/* ID */}
+                                        <span className="font-semibold">
+                                            {d.id}
+                                        </span>
 
-                            {/* Row 4 */}
-                            <div className="flex justify-between items-center py-4">
-                                <span className="w-[20%] font-semibold">PWR-004</span>
-                                <div className="w-[35%] flex flex-col">
-                                    <span>Blood Bank Power Monitor</span>
-                                    <span className="text-[#67737C] text-xs">v2.0.3</span>
-                                </div>
-                                <div className="w-[20%] border border-[#DFE6EB] rounded-lg px-3 py-1 text-center">
-                                    Power
-                                </div>
-                                <div className="w-[25%] flex items-center justify-end gap-2">
-                                    <WifiIcon className="text-[#00C950]" />
-                                    <div className="bg-[#DCFCE7] rounded-lg px-3 py-1 text-[#016630] text-xs font-medium">
-                                        Online
-                                    </div>
-                                </div>
-                            </div>
+                                        {/* Serial Number */}
+                                        <span className="font-medium">
+                                            {d.serialNumber}
+                                        </span>
 
-                            {/* Row 5 */}
-                            <div className="flex justify-between items-center py-4">
-                                <span className="w-[20%] font-semibold">MULTI-005</span>
-                                <div className="w-[35%] flex flex-col">
-                                    <span>Vaccine Storage Multi-Sensor</span>
-                                    <span className="text-[#67737C] text-xs">v2.2.1</span>
-                                </div>
-                                <div className="w-[20%] border border-[#DFE6EB] rounded-lg px-3 py-1 text-center">
-                                    Multi
-                                </div>
-                                <div className="w-[25%] flex items-center justify-end gap-2">
-                                    <WifiOffIcon className="text-[#DC2626]" />
-                                    <div className="bg-[#FEE2E2] rounded-lg px-3 py-1 text-[#B91C1C] text-xs font-medium">
-                                        Offline
+                                        {/* Name */}
+                                        <span>
+                                            {d.name}
+                                        </span>
+
+                                        {/* Device Type */}
+                                        <div className="border border-[#DFE6EB] rounded-lg px-3 py-1 text-center">
+                                            {typeLabel}
+                                        </div>
+
+                                        {/* Status */}
+                                        <div className="flex items-center justify-end gap-2">
+                                            {st.icon}
+                                            <div className={`${st.bg} rounded-lg px-3 py-1 ${st.text} text-xs font-medium`}>
+                                                {st.label}
+                                            </div>
+                                        </div>
+
+                                        {/* Readings Actions */}
+                                        <div className="flex justify-end gap-2">
+                                            <button
+                                                onClick={() => onViewReadings(d)}
+                                                className="px-3 py-1 text-xs font-medium border border-[#00648E] text-[#00648E] rounded-md hover:bg-[#E0F2F8] transition-colors"
+                                            >
+                                                View
+                                            </button>
+
+                                            <button
+                                                onClick={() => onAddReading(d)}
+                                                className="px-3 py-1 text-xs font-medium bg-[#00648E] text-white rounded-md hover:bg-[#005273] transition-colors"
+                                            >
+                                                Add
+                                            </button>
+                                        </div>
+
                                     </div>
-                                </div>
-                            </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
