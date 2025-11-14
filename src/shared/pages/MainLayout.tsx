@@ -8,6 +8,8 @@ import ArticleIcon from "@mui/icons-material/Article";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { useEffect } from "react";
 import { useGlobalStore } from "../stores/globalstore";
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 export function MainLayout() {
     const navigate = useNavigate();
@@ -21,10 +23,13 @@ export function MainLayout() {
         { icon: <WarningIcon />, label: "Alerts", path: "/alerts" },
         { icon: <InventoryIcon />, label: "Inventory", path: "/inventory" },
         { icon: <ArticleIcon />, label: "Report", path: "/report" },
+        { icon: <LocationOnIcon />, label: "Zones", path: "/zones" }
     ];
 
     const bottomItems = [
         { icon: <SettingsIcon />, label: "Settings", path: "/settings" },
+        { icon: <LogoutIcon />, label: "Logout", path: "/logout" }
+
     ];
 
     useEffect(() => {
