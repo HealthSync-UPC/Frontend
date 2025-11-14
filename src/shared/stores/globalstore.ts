@@ -10,6 +10,9 @@ import { profileService } from "../../settings/services/userService";
 import type { Iot } from "../../iot/model/iot";
 import type { Createreading } from "../../iot/model/createreading";
 import { iotService } from "../../iot/services/iot-services";
+import type { Category } from "../../inventory/model/category";
+import type { Item } from "../../inventory/model/item";
+import { inventoryService } from "../../inventory/service/inventory-service";
 interface GlobalState {
     // IAM
     user: User;
@@ -27,6 +30,16 @@ interface GlobalState {
     createDevice: (iot: Iot) => Promise<void>;
     createDeviceReading: (reading: Createreading) => Promise<void>;
     deleteDevice: (iot: Iot) => Promise<void>;
+
+    //Inventory
+    categories: Category[];
+    /* items: Item[]; */
+    getCategories: () => Promise<void>;
+    addCategory: (category: Category) => Promise<void>;
+    deleteCategory: (category: Category) => Promise<void>;
+    /* getItems: () => Promise<void>; */
+    addItem: (item: Item) => Promise<void>;
+    deleteItem: (item: Item) => Promise<void>;
 
     // Settings
     profiles: Profile[],
@@ -102,6 +115,7 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
             state.jwt = getTokenData(token);
         });
     },
+
     // IoT
     devices: [],
     getDevices: async () => {
@@ -162,6 +176,112 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
             console.error("Error deleting device:", error);
         }
     },
+
+    // Inventory
+    /* items: [], */
+    categories: [],
+    getCategories: async () => {
+        try {
+            const response = await inventoryService.getCategories();
+            if (response.data) {
+                set(state => {
+                    state.categories = response.data;
+                });
+                console.log("Fetched categories:", response.data);
+            }
+        } catch (error) {
+            console.error("Error fetching categories:", error);
+        }
+    },
+    addCategory: async (category: Category) => {
+        try {
+            const response = await inventoryService.addCategory(category);
+
+            if (response.data) {
+                set(state => {
+                    state.categories.push(response.data);
+                });
+            }
+        } catch (error) {
+            console.error("Error adding category:", error);
+        }
+    },
+    deleteCategory: async (category: Category) => {
+        try {
+            const response = await inventoryService.deleteCategory(category);
+
+            if (response.status == 204) {
+                set(state => {
+                    state.categories = state.categories.filter(cat => cat.id !== category.id);
+                });
+                console.log(`Deleted category with id: ${category.id}`);
+            }
+        } catch (error) {
+            console.error("Error deleting category:", error);
+        }
+    },
+    /* getItems: async () => {
+        try {
+            const response = await inventoryService.getItems();
+
+            if (response.data) {
+                set(state => {
+                    state.items = response.data;
+                });
+                console.log("Fetched items:", response.data);
+            }
+        } catch (error) {
+            console.error("Error fetching items:", error);
+        }
+    }, */
+    addItem: async (item: Item) => {
+        try {
+            const response = await inventoryService.addItem(item);
+            if (response.data) {
+                const newItem = response.data;
+                const updatedCategories = get().categories.map(category => {
+                    if (category.id === newItem.categoryId) {
+                        return {
+                            ...category,
+                            items: [...(category.items || []), newItem],
+                        };
+                    }
+                    return category;
+                });
+
+                set(state => {
+                    state.categories = updatedCategories;
+                });
+                console.log("Added item:", response.data);
+            }
+        } catch (error) {
+            console.error("Error adding item:", error);
+        }
+    },
+    deleteItem: async (item: Item) => {
+        try {
+            const response = await inventoryService.deleteItem(item);
+
+            if (response.status == 204) {
+                const updatedCategories = get().categories.map(category => {
+                    if (category.id === item.categoryId) {
+                        return {
+                            ...category,
+                            items: (category.items || []).filter(it => it.id !== item.id),
+                        };
+                    }
+                    return category;
+                });
+                set(state => {
+                    state.categories = updatedCategories;
+                });
+                console.log(`Deleted item with id: ${item.id}`);
+            }
+        } catch (error) {
+            console.error("Error deleting item:", error);
+        }
+    },
+
     // Settings
     profiles: [],
     getProfiles: async () => {
