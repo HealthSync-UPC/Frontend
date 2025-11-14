@@ -35,7 +35,6 @@ export function AddUserForm({ open, onClose }: AddUserFormProps) {
     const handleSubmit = async () => {
         const { firstName, lastName, position, email, password } = form;
         if (!firstName || !lastName || !position || !email || !password) {
-            alert('Complete all fields');
             return;
         }
 
@@ -64,7 +63,6 @@ export function AddUserForm({ open, onClose }: AddUserFormProps) {
             onClose();
         } catch (err) {
             console.error(err);
-            alert('Ocurrió un error al crear el usuario');
         } finally {
             setLoading(false);
         }
