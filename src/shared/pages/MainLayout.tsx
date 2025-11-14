@@ -15,6 +15,7 @@ export function MainLayout() {
     const navigate = useNavigate();
     const location = useLocation();
     const { getDevices, getProfiles } = useGlobalStore();
+    const { setJwt } = useGlobalStore();
 
     const menuItems = [
         { icon: <DashboardIcon />, label: "Dashboard", path: "/dashboard" },
@@ -28,7 +29,8 @@ export function MainLayout() {
 
     const bottomItems = [
         { icon: <SettingsIcon />, label: "Settings", path: "/settings" },
-        { icon: <LogoutIcon />, label: "Logout", path: "/logout" }
+
+
 
     ];
 
@@ -89,7 +91,29 @@ export function MainLayout() {
                                 </button>
                             );
                         })}
+
+
+                        <button
+
+                            onClick={() => {
+                                localStorage.removeItem("token");
+                                setJwt("");
+                                navigate("/login");
+                            }}
+                            className={`flex items-center gap-4 px-3 py-2 rounded-xl text-left transition-colors cursor-pointer bg-[#DFE6EB]                                   
+                                }`}
+                        >
+                            <LogoutIcon />
+                            <span>Logout</span>
+                        </button>
+
+
+
+
                     </div>
+
+
+
                 </div>
 
                 {/* Main content */}
@@ -100,3 +124,5 @@ export function MainLayout() {
         </div>
     );
 }
+
+

@@ -10,7 +10,9 @@ import { IoTPage } from "./iot/pages/IoTPage"
 import SettingsPage from "./settings/pages/SettingsPage"
 import { useGlobalStore } from "./shared/stores/globalstore"
 import { useEffect } from "react"
-import ZoneManagementPage from "./zones/pages/zonesPage"
+import ZoneManagementPage from "./zones/pages/ZonesPage"
+
+
 
 function App() {
   const { setJwt } = useGlobalStore();
@@ -30,6 +32,7 @@ function App() {
         <Route path="/verify" element={<CodeAuth />} />
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/setup-mfa" element={<Qrimg />} />
+
       </Route>
 
       <Route element={<PrivateRoute />}>
@@ -41,7 +44,7 @@ function App() {
         <Route path="/report" element={<p>Report</p>} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/zones" element={<ZoneManagementPage />} />
-        <Route path="/logout" element={<Navigate to="/login" replace />} />
+
       </Route>
     </Routes>
   )
