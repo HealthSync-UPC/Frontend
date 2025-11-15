@@ -7,7 +7,7 @@ interface AddDeviceFormValues {
     name: string;
     serialNumber: string;
     type: string;
-    location: string;
+    /* location: string; */
     status: string;
     unit: string;
 }
@@ -22,7 +22,7 @@ export function AddDeviceModal({ open, onClose }: AddDeviceFormProps) {
         name: '',
         serialNumber: '',
         type: 'TEMPERATURE',
-        location: '',
+        /* location: '', */
         status: 'ONLINE',
         unit: '°C',
     });
@@ -65,9 +65,9 @@ export function AddDeviceModal({ open, onClose }: AddDeviceFormProps) {
             };
 
     const handleSubmit = async () => {
-        const { name, serialNumber, type, location, status, unit } = form;
+        const { name, serialNumber, type, /* location, */ status, unit } = form;
 
-        if (!name || !serialNumber || !type || !location || !status) {
+        if (!name || !serialNumber || !type || /* !location || */ !status) {
             return;
         }
 
@@ -81,7 +81,7 @@ export function AddDeviceModal({ open, onClose }: AddDeviceFormProps) {
                 name,
                 serialNumber,
                 type,
-                location,
+                "",
                 status,
                 finalUnit,
                 []
@@ -93,7 +93,7 @@ export function AddDeviceModal({ open, onClose }: AddDeviceFormProps) {
                 name: '',
                 serialNumber: '',
                 type: 'TEMPERATURE',
-                location: '',
+                /* location: '', */
                 status: 'ONLINE',
                 unit: '°C',
             });
@@ -175,7 +175,7 @@ export function AddDeviceModal({ open, onClose }: AddDeviceFormProps) {
                     </div>
 
                     {/* Location */}
-                    <div>
+                    {/* <div>
                         <label className="block text-sm font-medium text-[#67737C] mb-1">
                             Location
                         </label>
@@ -185,7 +185,7 @@ export function AddDeviceModal({ open, onClose }: AddDeviceFormProps) {
                             onChange={onChange('location')}
                             className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00648E] focus:border-transparent"
                         />
-                    </div>
+                    </div> */}
 
                     {/* Status */}
                     <div>
