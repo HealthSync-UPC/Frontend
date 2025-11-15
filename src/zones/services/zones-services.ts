@@ -1,0 +1,55 @@
+import type { Item } from "../../inventory/model/item";
+import type { Iot } from "../../iot/model/iot";
+import http from "../../shared/services/http";
+import type { Member } from "../model/member";
+import type { Zone } from "../model/zone";
+
+export class ZonesServices {
+    private endpoint = import.meta.env.VITE_API_BASE_URL + '/zones';
+
+    async getZones() {
+        return http.get<Zone[]>(this.endpoint);
+    }
+
+    async addZone(zone: Zone) {
+        return http.post<Zone>(this.endpoint, zone);
+    }
+
+    async deleteZone(zone: Zone) {
+        return http.delete<void>(`${this.endpoint}/${zone.id}`);
+    }
+
+    async addMemberToZone(zone: Zone, member: Member) {
+        const data = { userId: member.id };
+        return http.post<Zone>(`${this.endpoint}/${zone.id}/members`, data);
+    }
+
+    async removeMemberFromZone(zone: Zone, member: Member) {
+        return http.delete(`${this.endpoint}/${zone.id}/members/${member.id}`);
+    }
+
+    async addItemToZone(zone: Zone, item: Item) {
+        const data = { itemId: item.id };
+        return http.post<Zone>(`${this.endpoint}/${zone.id}/items`, data);
+    }
+
+    async removeItemFromZone(zone: Zone, item: Item) {
+        return http.delete(`${this.endpoint}/${zone.id}/items/${item.id}`);
+    }
+
+    async addIotToZone(zone: Zone, iot: Iot) {
+        const data = { deviceId: iot.id };
+        return http.post<Zone>(`${this.endpoint}/${zone.id}/iots`, data);
+    }
+
+    async removeIotFromZone(zone: Zone, iot: Iot) {
+        return http.delete(`${this.endpoint}/${zone.id}/iots/${iot.id}`);
+    }
+
+    async tryAccess(zone: Zone, member: Member) {
+        const data = { userId: member.id };
+        return http.post<{ accessGranted: boolean }>(`${this.endpoint}/${zone.id}/access`, data);
+    }
+}
+
+export const zonesService = new ZonesServices();

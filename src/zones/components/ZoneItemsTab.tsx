@@ -1,7 +1,7 @@
-import type { ZoneItem } from './ZoneDetailsModal';
+import type { Item } from '../../inventory/model/item';
 
 type Props = {
-    items: ZoneItem[];
+    items: Item[];
 };
 
 export function ZoneItemsTab({ items }: Props) {
@@ -34,7 +34,7 @@ export function ZoneItemsTab({ items }: Props) {
                             <td className="py-3 pr-4">{it.unit}</td>
                             <td className="py-3 pr-2">
                                 <span className="rounded-full bg-[#E6F4FF] px-3 py-1 text-xs font-medium text-[#0B63A9]">
-                                    {it.status}
+                                    {it.active ? 'Active' : 'Inactive'}
                                 </span>
                             </td>
                         </tr>

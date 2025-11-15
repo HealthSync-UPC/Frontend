@@ -1,6 +1,9 @@
 import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 import type { ReactNode } from 'react';
+import { useGlobalStore } from '../../shared/stores/globalstore';
+import dayjs from 'dayjs';
+import type { Zone } from '../model/zone';
 
 export type ZoneRow = { id: number; name: string; devices: number; items: number; members: number };
 
@@ -34,13 +37,9 @@ const AccessBadge = ({ type }: { type: 'granted' | 'denied' }) => {
     );
 };
 
-function ZoneTable({
-    zones,
-    onViewZone,
-}: {
-    zones: ZoneRow[];
-    onViewZone: (zone: ZoneRow) => void;
-}) {
+function ZoneTable({ onViewZone }: { onViewZone: (zone: Zone) => void; }) {
+    const { zones } = useGlobalStore();
+
     return (
         <Card className="xl:col-span-2">
             <div className="mb-1 flex items-end justify-between">
@@ -71,13 +70,13 @@ function ZoneTable({
                                     </div>
                                 </td>
                                 <td className="py-4 pr-4">
-                                    <CountPill n={z.devices} />
+                                    <CountPill n={z.devices.length} />
                                 </td>
                                 <td className="py-4 pr-4">
-                                    <CountPill n={z.items} />
+                                    <CountPill n={z.items.length} />
                                 </td>
                                 <td className="py-4 pr-4">
-                                    <CountPill n={z.members} />
+                                    <CountPill n={z.members.length} />
                                 </td>
                                 <td className="py-4 pr-2">
                                     <button
@@ -86,6 +85,7 @@ function ZoneTable({
                                     >
                                         View
                                     </button>
+
                                 </td>
                             </tr>
                         ))}
@@ -103,7 +103,13 @@ function ZoneTable({
     );
 }
 
-function RecentAccess({ access }: { access: AccessRow[] }) {
+function RecentAccess() {
+    const { zones } = useGlobalStore();
+
+    const accessLogs = zones.flatMap((zone) => zone.accessLogs);
+
+    accessLogs.sort((a, b) => dayjs(b.accessTime).diff(a.accessTime));
+
     return (
         <Card>
             <div className="mb-3 flex items-center gap-2">
@@ -112,40 +118,37 @@ function RecentAccess({ access }: { access: AccessRow[] }) {
             </div>
 
             <div className="flex flex-col gap-3">
-                {access.length === 0 && (
+                {accessLogs.length === 0 && (
                     <p className="text-sm text-gray-500">No access events match the selected filters.</p>
                 )}
 
-                {access.map((a, idx) => (
-                    <div
-                        key={idx}
-                        className="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3"
-                    >
-                        <div>
-                            <p className="font-medium">{a.user}</p>
-                            <p className="text-xs text-gray-500">{a.when}</p>
+                {accessLogs.map((a, idx) => {
+                    const zone = zones.find((z) => z.accessLogs.includes(a))!;
+
+                    return (
+                        <div
+                            key={idx}
+                            className="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3"
+                        >
+                            <div>
+                                <p className='font-bold'>Zone: {zone.name}</p>
+                                <p className="font-medium">{a.name}</p>
+                                <p className="text-xs text-gray-500">{dayjs(a.accessTime).format('LLLL')}</p>
+                            </div>
+                            <AccessBadge type={a.accessGranted ? 'granted' : 'denied'} />
                         </div>
-                        <AccessBadge type={a.status} />
-                    </div>
-                ))}
+                    )
+                })}
             </div>
         </Card>
     );
 }
 
-export function ZoneMainSection({
-    zones,
-    access,
-    onViewZone,
-}: {
-    zones: ZoneRow[];
-    access: AccessRow[];
-    onViewZone: (zone: ZoneRow) => void;
-}) {
+export function ZoneMainSection({ onViewZone }: { onViewZone: (zone: Zone) => void; }) {
     return (
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-            <ZoneTable zones={zones} onViewZone={onViewZone} />
-            <RecentAccess access={access} />
+            <ZoneTable onViewZone={onViewZone} />
+            <RecentAccess />
         </div>
     );
 }

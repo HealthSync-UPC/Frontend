@@ -1,7 +1,8 @@
-import type { ZoneAccessLog } from './ZoneDetailsModal';
+import dayjs from 'dayjs';
+import type { AccessLog } from '../model/access-log';
 
 type Props = {
-    logs: ZoneAccessLog[];
+    logs: AccessLog[];
 };
 
 const AccessBadge = ({ type }: { type: 'granted' | 'denied' }) => {
@@ -33,10 +34,10 @@ export function ZoneAccessLogsTab({ logs }: Props) {
                     className="flex items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3"
                 >
                     <div>
-                        <p className="font-medium">{l.user}</p>
-                        <p className="text-xs text-gray-500">{l.timestamp}</p>
+                        <p className="font-medium">{l.name}</p>
+                        <p className="text-xs text-gray-500">{dayjs(l.accessTime).format('lll')}</p>
                     </div>
-                    <AccessBadge type={l.status} />
+                    <AccessBadge type={l.accessGranted ? 'granted' : 'denied'} />
                 </div>
             ))}
         </div>

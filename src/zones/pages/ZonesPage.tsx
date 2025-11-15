@@ -2,11 +2,13 @@ import { useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import TuneIcon from '@mui/icons-material/Tune';
-import { ZoneMainSection, type AccessRow, type ZoneRow } from '../components/ZoneMainSection';
-import { ZoneDetailsModal, type ZoneDetails } from '../components/ZoneDetailsModal';
+import { ZoneMainSection } from '../components/ZoneMainSection';
+import { ZoneDetailsModal } from '../components/ZoneDetailsModal';
 import { FilterModal, type ZoneFilters } from '../components/FilterModal';
 import { ZoneStats } from '../components/ZoneStats';
 import { AddZoneModal } from '../components/AddZoneModal';
+import type { Zone } from '../model/zone';
+import { useGlobalStore } from '../../shared/stores/globalstore';
 /* import { ZoneStats } from './components/ZoneStats';
 import {
     ZoneMainSection,
@@ -21,15 +23,15 @@ import {
 } from './components/ZoneDetailsModal'; */
 
 // ---- MOCK ZONES ----
-const ZONES: ZoneRow[] = [
+/* const ZONES: ZoneRow[] = [
     { id: 1, name: 'Pharmacy Cold Storage', devices: 2, items: 2, members: 3 },
     { id: 2, name: 'Laboratory Refrigerators', devices: 1, items: 1, members: 2 },
     { id: 3, name: 'Blood Bank', devices: 1, items: 1, members: 1 },
     { id: 4, name: 'Vaccine Storage', devices: 1, items: 1, members: 1 },
-];
+]; */
 
 // ---- MOCK ACCESOS GLOBALES (para el panel Recent Access + filtros) ----
-const ACCESS: AccessRow[] = [
+/* const ACCESS: AccessRow[] = [
     {
         user: 'Unknown User',
         when: '14/11/2024, 10:45:00 a. m.',
@@ -65,10 +67,10 @@ const ACCESS: AccessRow[] = [
         location: 'Blood Bank',
         daysAgo: 9,
     },
-];
+]; */
 
 // ---- MOCK DETALLES POR ZONA (para el modal de View) ----
-const ZONE_DETAILS: Record<number, ZoneDetails> = {
+/* const ZONE_DETAILS: Record<number, ZoneDetails> = {
     1: {
         id: 1,
         name: 'Pharmacy Cold Storage',
@@ -169,7 +171,7 @@ const ZONE_DETAILS: Record<number, ZoneDetails> = {
         members: [],
         accessLogs: [],
     },
-};
+}; */
 
 const DEFAULT_FILTERS: ZoneFilters = {
     status: 'All Statuses',
@@ -183,15 +185,16 @@ export default function ZoneManagementPage() {
     const [openFilters, setOpenFilters] = useState(false);
     const [filters, setFilters] = useState<ZoneFilters>(DEFAULT_FILTERS);
 
-    const [selectedZone, setSelectedZone] = useState<ZoneDetails | null>(null);
+    const [selectedZone, setSelectedZone] = useState<Zone | null>(null);
+    const { zones } = useGlobalStore();
 
     // búsqueda por nombre
-    const zonesFiltered = ZONES.filter((z) =>
-        z.name.toLowerCase().includes(query.trim().toLowerCase())
-    );
+    /*  const zonesFiltered = ZONES.filter((z) =>
+         z.name.toLowerCase().includes(query.trim().toLowerCase())
+     ); */
 
     // filtros para Recent Access
-    const accessFiltered = ACCESS.filter((a) => {
+    /* const accessFiltered = ACCESS.filter((a) => {
         if (filters.status === 'Access Granted' && a.status !== 'granted') return false;
         if (filters.status === 'Access Denied' && a.status !== 'denied') return false;
 
@@ -201,7 +204,7 @@ export default function ZoneManagementPage() {
         if (filters.dateRange === 'Last 7 Days' && a.daysAgo > 7) return false;
 
         return true;
-    });
+    }); */
 
     const handleApplyFilters = (f: ZoneFilters) => {
         setFilters(f);
@@ -210,11 +213,6 @@ export default function ZoneManagementPage() {
 
     const handleResetFilters = () => {
         setFilters(DEFAULT_FILTERS);
-    };
-
-    const handleViewZone = (zone: ZoneRow) => {
-        const details = ZONE_DETAILS[zone.id];
-        setSelectedZone(details ?? null);
     };
 
     return (
@@ -261,11 +259,13 @@ export default function ZoneManagementPage() {
             </div>
 
             {/* Stats + main content */}
-            <ZoneStats totalZones={ZONES.length} totalMembers={7} devices={5} items={5} />
+            <ZoneStats
+                totalZones={zones.length}
+                totalMembers={zones.flatMap(z => z.members).length}
+                devices={zones.flatMap(z => z.devices).length}
+                items={zones.flatMap(z => z.items).length} />
             <ZoneMainSection
-                zones={zonesFiltered}
-                access={accessFiltered}
-                onViewZone={handleViewZone}
+                onViewZone={setSelectedZone}
             />
 
             {/* Modales */}
@@ -280,8 +280,8 @@ export default function ZoneManagementPage() {
             />
 
             <ZoneDetailsModal
-                open={!!selectedZone}
-                zone={selectedZone}
+                open={selectedZone != null}
+                zone={selectedZone!!}
                 onClose={() => setSelectedZone(null)}
             />
         </div>

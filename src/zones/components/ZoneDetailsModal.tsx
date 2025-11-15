@@ -4,30 +4,26 @@ import SensorsOutlinedIcon from '@mui/icons-material/SensorsOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import Groups2OutlinedIcon from '@mui/icons-material/Groups2Outlined';
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
-
 import { AssignDevicesModal } from './AssignDevicesModal';
 import { AssignItemsModal } from './AssignItemsModal';
 import { AssignMembersModal } from './AssignMembersModal';
-
-
-
 import { EditZoneModal } from './EditZoneModal';
 import { ZoneDevicesTab } from './ZoneDevicesTab';
 import { ZoneItemsTab } from './ZoneItemsTab';
 import { ZoneMembersTab } from './ZoneMembersTab';
 import { ZoneAccessLogsTab } from './ZoneAccessLogsTab';
+import type { Zone } from '../model/zone';
 
 type TabKey = 'devices' | 'items' | 'members' | 'access';
 
 type ZoneDetailsModalProps = {
     open: boolean;
-    zone: any;        // puedes tiparlo mejor si quieres
+    zone: Zone;
     onClose: () => void;
 };
 
 export function ZoneDetailsModal({ open, zone, onClose }: ZoneDetailsModalProps) {
     const [activeTab, setActiveTab] = useState<TabKey>('devices');
-
     const [openAssignDevices, setOpenAssignDevices] = useState(false);
     const [openAssignItems, setOpenAssignItems] = useState(false);
     const [openAssignMembers, setOpenAssignMembers] = useState(false);
@@ -84,9 +80,6 @@ export function ZoneDetailsModal({ open, zone, onClose }: ZoneDetailsModalProps)
 
                     {/* Header */}
                     <p className="text-xl font-semibold flex items-center gap-2">
-                        <span role="img" aria-label="pin">
-                            📍
-                        </span>
                         {zone.name}
                     </p>
                     <p className="text-sm text-gray-500 mb-5">
@@ -125,7 +118,7 @@ export function ZoneDetailsModal({ open, zone, onClose }: ZoneDetailsModalProps)
                     <div className="mt-4 max-h-[55vh] overflow-y-auto rounded-xl border border-gray-200">
                         {activeTab === 'devices' && <ZoneDevicesTab devices={zone.devices} />}
                         {activeTab === 'items' && <ZoneItemsTab items={zone.items} />}
-                        {activeTab === 'members' && <ZoneMembersTab members={zone.members} />}
+                        {activeTab === 'members' && <ZoneMembersTab zone={zone} members={zone.members} />}
                         {activeTab === 'access' && <ZoneAccessLogsTab logs={zone.accessLogs} />}
                     </div>
 
@@ -213,7 +206,6 @@ export function ZoneDetailsModal({ open, zone, onClose }: ZoneDetailsModalProps)
             <EditZoneModal
                 open={openEditZone}
                 initialName={zone.name}
-                initialDescription={zone.description || ''}
                 onClose={() => setOpenEditZone(false)}
                 onSave={handleEditSave}
             />

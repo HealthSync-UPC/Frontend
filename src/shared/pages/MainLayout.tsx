@@ -1,10 +1,10 @@
 import { Outlet, useNavigate, useLocation } from "react-router";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import MemoryIcon from "@mui/icons-material/Memory";
-import ShowChartIcon from "@mui/icons-material/ShowChart";
+/* import ShowChartIcon from "@mui/icons-material/ShowChart"; */
 import WarningIcon from "@mui/icons-material/Warning";
 import InventoryIcon from "@mui/icons-material/Inventory";
-import ArticleIcon from "@mui/icons-material/Article";
+/* import ArticleIcon from "@mui/icons-material/Article"; */
 import SettingsIcon from "@mui/icons-material/Settings";
 import { useEffect } from "react";
 import { useGlobalStore } from "../stores/globalstore";
@@ -14,24 +14,21 @@ import LogoutIcon from '@mui/icons-material/Logout';
 export function MainLayout() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { getDevices, getCategories, getItems, getProfiles } = useGlobalStore();
+    const { getDevices, getCategories, getItems, getZones, getProfiles } = useGlobalStore();
     const { setJwt } = useGlobalStore();
 
     const menuItems = [
         { icon: <DashboardIcon />, label: "Dashboard", path: "/dashboard" },
         { icon: <MemoryIcon />, label: "IoT Devices", path: "/devices" },
-        { icon: <ShowChartIcon />, label: "Monitoring", path: "/monitoring" },
+        /* { icon: <ShowChartIcon />, label: "Monitoring", path: "/monitoring" }, */
         { icon: <WarningIcon />, label: "Alerts", path: "/alerts" },
         { icon: <InventoryIcon />, label: "Inventory", path: "/inventory" },
-        { icon: <ArticleIcon />, label: "Report", path: "/report" },
+        /* { icon: <ArticleIcon />, label: "Report", path: "/report" }, */
         { icon: <LocationOnIcon />, label: "Zones", path: "/zones" }
     ];
 
     const bottomItems = [
         { icon: <SettingsIcon />, label: "Settings", path: "/settings" },
-
-
-
     ];
 
     useEffect(() => {
@@ -39,6 +36,7 @@ export function MainLayout() {
         getCategories();
         getItems();
         getProfiles();
+        getZones();
     }, [])
 
     return (
@@ -94,9 +92,7 @@ export function MainLayout() {
                             );
                         })}
 
-
                         <button
-
                             onClick={() => {
                                 localStorage.removeItem("token");
                                 setJwt("");
@@ -107,14 +103,7 @@ export function MainLayout() {
                             <LogoutIcon />
                             <span>Logout</span>
                         </button>
-
-
-
-
                     </div>
-
-
-
                 </div>
 
                 {/* Main content */}

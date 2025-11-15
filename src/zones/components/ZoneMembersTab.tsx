@@ -1,10 +1,14 @@
-import type { ZoneMember } from './ZoneDetailsModal';
+/* import { useGlobalStore } from '../../shared/stores/globalstore'; */
+import type { Member } from '../model/member';
+import type { Zone } from '../model/zone';
 
 type Props = {
-    members: ZoneMember[];
+    zone: Zone;
+    members: Member[];
 };
 
-export function ZoneMembersTab({ members }: Props) {
+export function ZoneMembersTab({ zone, members }: Props) {
+    /* const { removeMemberFromZone } = useGlobalStore(); */
     if (members.length === 0) {
         return (
             <div className="p-4 text-sm text-gray-500">
@@ -13,23 +17,25 @@ export function ZoneMembersTab({ members }: Props) {
         );
     }
 
+    const handleRemoveMember = async (member: Member) => {
+        console.log('Remove member from zone', member, zone);
+        /*  alert('Member removed (mock)');
+         await removeMemberFromZone(zone, member); */
+    }
+
     return (
         <div className="space-y-4 p-4">
             {members.map((m) => (
                 <div
-                    key={m.memberId}
+                    key={m.id}
                     className="flex items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3"
                 >
                     <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1E4288] text-xs font-semibold text-white">
-                            {m.initials}
-                        </div>
                         <div>
                             <p className="font-medium">{m.name}</p>
-                            <p className="text-xs text-gray-500">Member ID: {m.memberId}</p>
                         </div>
                     </div>
-                    <button className="rounded-md border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50">
+                    <button onClick={() => handleRemoveMember(m)} className="rounded-md border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50">
                         Remove
                     </button>
                 </div>
