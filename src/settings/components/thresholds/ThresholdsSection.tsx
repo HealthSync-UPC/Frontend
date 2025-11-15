@@ -90,10 +90,10 @@ export function ThresholdsSection() {
     const updateHum = (i: number, val: number) =>
         setHumidity((prev) => prev.map((h, idx) => (idx === i ? { ...h, max: val } : h)));
 
-    const saveThresholds = () => {
+    /* const saveThresholds = () => {
         console.log('Saving thresholds (mock):', { temp, humidity });
 
-    };
+    }; */
 
     return (
         <div className="flex flex-col gap-8">

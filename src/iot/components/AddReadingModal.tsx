@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
-import { Modal, Box } from "@mui/material";
-import type { Iot } from "../model/iot";
-import dayjs from "dayjs";
+import { Box, Modal } from "@mui/material";
+import { useEffect, useState } from "react";
 import { useGlobalStore } from "../../shared/stores/globalstore";
 import type { Createreading } from "../model/createreading";
+import type { Iot } from "../model/iot";
 
 interface AddReadingModalProps {
     open: boolean;
@@ -24,7 +23,6 @@ export function AddReadingModal({ open, onClose, device }: AddReadingModalProps)
 
     const handleSubmit = async () => {
         if (!value.trim()) {
-            alert("Value is required");
             return;
         }
 
@@ -40,7 +38,6 @@ export function AddReadingModal({ open, onClose, device }: AddReadingModalProps)
             onClose();
         } catch (err) {
             console.error(err);
-            alert("Error while saving reading");
         } finally {
             setLoading(false);
         }

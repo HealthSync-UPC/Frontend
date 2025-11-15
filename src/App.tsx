@@ -10,9 +10,8 @@ import { IoTPage } from "./iot/pages/IoTPage"
 import SettingsPage from "./settings/pages/SettingsPage"
 import { useGlobalStore } from "./shared/stores/globalstore"
 import { useEffect } from "react"
+import { InventoryPage } from "./inventory/page/InventoryPage"
 import ZoneManagementPage from "./zones/pages/ZonesPage"
-
-
 
 function App() {
   const { setJwt } = useGlobalStore();
@@ -40,7 +39,7 @@ function App() {
         <Route path="/devices" element={<IoTPage />} />
         <Route path="/monitoring" element={<p>Monitoring</p>} />
         <Route path="/alerts" element={<p>Alerts</p>} />
-        <Route path="/inventory" element={<p>Inventory</p>} />
+        <Route path="/inventory" element={<InventoryPage />} />
         <Route path="/report" element={<p>Report</p>} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/zones" element={<ZoneManagementPage />} />

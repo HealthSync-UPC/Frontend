@@ -14,7 +14,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 export function MainLayout() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { getDevices, getProfiles } = useGlobalStore();
+    const { getDevices, getCategories, getItems, getProfiles } = useGlobalStore();
     const { setJwt } = useGlobalStore();
 
     const menuItems = [
@@ -36,6 +36,8 @@ export function MainLayout() {
 
     useEffect(() => {
         getDevices();
+        getCategories();
+        getItems();
         getProfiles();
     }, [])
 
@@ -100,8 +102,7 @@ export function MainLayout() {
                                 setJwt("");
                                 navigate("/login");
                             }}
-                            className={`flex items-center gap-4 px-3 py-2 rounded-xl text-left transition-colors cursor-pointer bg-[#DFE6EB]                                   
-                                }`}
+                            className="flex items-center gap-4 px-3 py-2 rounded-xl text-left transition-colors cursor-pointer hover:bg-[#EDF2F5]"
                         >
                             <LogoutIcon />
                             <span>Logout</span>
