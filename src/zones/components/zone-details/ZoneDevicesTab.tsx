@@ -1,4 +1,4 @@
-import type { Iot } from "../../iot/model/iot";
+import { useZoneStore } from "../../stores/zone-store";
 
 const typeUI: Record<string, string> = {
     TEMPERATURE: "Temperature",
@@ -30,7 +30,10 @@ const statusUI: Record<StatusKey, {
     },
 };
 
-export function ZoneDevicesTab({ devices }: { devices: Iot[] }) {
+export function ZoneDevicesTab() {
+    const { selectedZone } = useZoneStore();
+    const devices = selectedZone?.devices || [];
+
     if (devices.length === 0) {
         return (
             <div className="p-4 text-sm text-gray-500">

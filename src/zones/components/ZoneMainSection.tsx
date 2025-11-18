@@ -1,19 +1,9 @@
 import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
+import dayjs from 'dayjs';
 import type { ReactNode } from 'react';
 import { useGlobalStore } from '../../shared/stores/globalstore';
-import dayjs from 'dayjs';
-import type { Zone } from '../model/zone';
-
-export type ZoneRow = { id: number; name: string; devices: number; items: number; members: number };
-
-export type AccessRow = {
-    user: string;
-    when: string;
-    status: 'granted' | 'denied';
-    location: string;
-    daysAgo: number;
-};
+import { useZoneStore } from '../stores/zone-store';
 
 const Card = ({ children, className = '' }: { children: ReactNode; className?: string }) => (
     <div className={`rounded-xl border border-gray-200 bg-white p-5 ${className}`}>{children}</div>
@@ -37,8 +27,9 @@ const AccessBadge = ({ type }: { type: 'granted' | 'denied' }) => {
     );
 };
 
-function ZoneTable({ onViewZone }: { onViewZone: (zone: Zone) => void; }) {
+function ZoneTable({ onOpenDetails }: { onOpenDetails: () => void }) {
     const { zones } = useGlobalStore();
+    const { setSelectedZone } = useZoneStore();
 
     return (
         <Card className="xl:col-span-2">
@@ -80,7 +71,10 @@ function ZoneTable({ onViewZone }: { onViewZone: (zone: Zone) => void; }) {
                                 </td>
                                 <td className="py-4 pr-2">
                                     <button
-                                        onClick={() => onViewZone(z)}
+                                        onClick={() => {
+                                            setSelectedZone(z);
+                                            onOpenDetails();
+                                        }}
                                         className="rounded-md border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50"
                                     >
                                         View
@@ -144,10 +138,10 @@ function RecentAccess() {
     );
 }
 
-export function ZoneMainSection({ onViewZone }: { onViewZone: (zone: Zone) => void; }) {
+export function ZoneMainSection({ onOpenDetails }: { onOpenDetails: () => void }) {
     return (
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-            <ZoneTable onViewZone={onViewZone} />
+            <ZoneTable onOpenDetails={onOpenDetails} />
             <RecentAccess />
         </div>
     );

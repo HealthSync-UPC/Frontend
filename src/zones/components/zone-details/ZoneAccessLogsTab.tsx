@@ -1,9 +1,6 @@
 import dayjs from 'dayjs';
-import type { AccessLog } from '../model/access-log';
-
-type Props = {
-    logs: AccessLog[];
-};
+import type { AccessLog } from '../../model/access-log';
+import { useZoneStore } from '../../stores/zone-store';
 
 const AccessBadge = ({ type }: { type: 'granted' | 'denied' }) => {
     const styles =
@@ -17,7 +14,10 @@ const AccessBadge = ({ type }: { type: 'granted' | 'denied' }) => {
     );
 };
 
-export function ZoneAccessLogsTab({ logs }: Props) {
+export function ZoneAccessLogsTab() {
+    const { selectedZone } = useZoneStore();
+    const logs = selectedZone?.accessLogs || [];
+
     if (logs.length === 0) {
         return (
             <div className="p-4 text-sm text-gray-500">
