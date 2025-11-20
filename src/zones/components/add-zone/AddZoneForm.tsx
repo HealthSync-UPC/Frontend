@@ -1,59 +1,66 @@
 import { useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
+import { useGlobalStore } from '../../../shared/stores/globalstore';
+import type { Item } from '../../../inventory/model/item';
+import type { Iot } from '../../../iot/model/iot';
+import type { User } from '../../../settings/model/User';
+import { Zone } from '../../model/zone';
+import { Member } from '../../model/member';
 
-type TabKey = 'devices' | 'items' | 'members';
-
-type Option = {
-    id: string;
-    title: string;
-    subtitle: string;
-};
+type TabKey = 'nfc' | 'devices' | 'items' | 'members';
 
 type Props = {
     onCancel: () => void;
+    onSetMessage: (msg: string) => void;
+    onSetOpenSnackBar: (open: boolean) => void;
 };
 
-const DEVICES: Option[] = [
-    { id: 'dev-1', title: 'Temperature Sensor A1', subtitle: 'Available' },
-    { id: 'dev-2', title: 'Humidity Monitor H1', subtitle: 'Available' },
-    { id: 'dev-3', title: 'Door Sensor D1', subtitle: 'Available' },
-    { id: 'dev-4', title: 'Pressure Monitor P1', subtitle: 'Available' },
-];
-
-const ITEMS: Option[] = [
-    { id: 'itm-1', title: 'Insulin Vial 10ml', subtitle: 'MED-001' },
-    { id: 'itm-2', title: 'COVID-19 Vaccine', subtitle: 'VAC-001' },
-    { id: 'itm-3', title: 'Blood Type O+', subtitle: 'BLD-001' },
-    { id: 'itm-4', title: 'IV Fluids 0.9%', subtitle: 'IVF-002' },
-];
-
-const MEMBERS: Option[] = [
-    { id: 'mem-1', title: 'Dr. Sarah Johnson', subtitle: 'Doctor' },
-    { id: 'mem-2', title: 'Pharmacist Mike Chen', subtitle: 'Pharmacist' },
-    { id: 'mem-3', title: 'Nurse Emily Rodriguez', subtitle: 'Nurse' },
-    { id: 'mem-4', title: 'Lab Tech John Smith', subtitle: 'Lab Technician' },
-];
-
-export function AddZoneForm({ onCancel }: Props) {
+export function AddZoneForm({ onCancel, onSetMessage, onSetOpenSnackBar }: Props) {
+    const { devices, items, profiles, addZone, getZones, getDevices, getItems } = useGlobalStore();
     const [zoneName, setZoneName] = useState('');
-    const [tab, setTab] = useState<TabKey>('devices');
+    const [tab, setTab] = useState<TabKey>('nfc');
+    const [selectedNFC, setSelectedNFC] = useState<number | null>(null);
+    const [selectedDevices, setSelectedDevices] = useState<number[]>([]);
+    const [selectedItems, setSelectedItems] = useState<number[]>([]);
+    const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
 
-    const [selectedDevices, setSelectedDevices] = useState<string[]>([]);
-    const [selectedItems, setSelectedItems] = useState<string[]>([]);
-    const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
-
-    const toggle = (id: string, list: string[], setter: (v: string[]) => void) => {
-        setter(list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
+    const toggle = (id: number, list: number[], setter: (v: number[]) => void) => {
+        setter(list.includes(id) ? list.filter(x => x !== id) : [...list, id]);
     };
 
-    const handleAdd = () => {
-        console.log('New zone (mock):', {
-            zoneName,
-            devices: selectedDevices,
-            items: selectedItems,
-            members: selectedMembers,
-        });
-        alert('Zone created ');
+    const handleAdd = async () => {
+        const devicesToAdd = devices.filter(d => selectedDevices.includes(d.id) || d.id === selectedNFC);
+        const itemsToAdd = items.filter(i => selectedItems.includes(i.id));
+        const membersToAdd = profiles.filter(p => selectedMembers.includes(p.id))
+            .map(p => new Member(p.id, p.firstName + ' ' + p.lastName));
+
+        const newZone: Omit<Zone, 'id' | 'accessLogs'> = {
+            name: zoneName,
+            devices: devicesToAdd,
+            items: itemsToAdd,
+            members: membersToAdd
+        }
+
+        if (!zoneName.trim()) {
+            onSetMessage('Zone name is required');
+            onSetOpenSnackBar(true);
+            return;
+        }
+
+        if (selectedNFC === null) {
+            onSetMessage('Please select an NFC device');
+            onSetOpenSnackBar(true);
+            return;
+        }
+
+        await addZone(newZone as Zone);
+        onSetMessage('Zone added successfully');
+        onSetOpenSnackBar(true);
+
+        await getZones();
+        await getDevices();
+        await getItems();
+
         onCancel();
     };
 
@@ -61,28 +68,35 @@ export function AddZoneForm({ onCancel }: Props) {
     const itemsCount = selectedItems.length;
     const membersCount = selectedMembers.length;
 
-    let options: Option[] = [];
-    let selectedList: string[] = [];
-    let setter: (v: string[]) => void = () => { };
+    let options: Iot[] | Item[] | User[] = [];
+    let selectedList: number[] = [];
+    let setterArray: (v: number[]) => void = () => { };
+    let setterSingle: (v: number | null) => void = () => { };
 
-    if (tab === 'devices') {
-        options = DEVICES;
+
+    if (tab === 'nfc') {
+        options = devices.filter(d => d.type === 'ACCESS_NFC');
+        selectedList = selectedNFC !== null ? [selectedNFC] : [];
+        setterSingle = setSelectedNFC;
+    } else if (tab === 'devices') {
+        options = devices.filter(d => d.type !== 'ACCESS_NFC');
         selectedList = selectedDevices;
-        setter = setSelectedDevices;
+        setterArray = setSelectedDevices;
     } else if (tab === 'items') {
-        options = ITEMS;
+        options = items;
         selectedList = selectedItems;
-        setter = setSelectedItems;
+        setterArray = setSelectedItems;
     } else {
-        options = MEMBERS;
+        options = profiles;
         selectedList = selectedMembers;
-        setter = setSelectedMembers;
+        setterArray = setSelectedMembers;
     }
+
 
     const TabButton = ({
         label,
         active,
-        onClick,
+        onClick
     }: {
         label: string;
         active: boolean;
@@ -101,6 +115,7 @@ export function AddZoneForm({ onCancel }: Props) {
 
     return (
         <div className="relative max-h-[90vh] w-full max-w-2xl rounded-2xl bg-white p-6 shadow-xl">
+
             <button
                 onClick={onCancel}
                 className="absolute right-4 top-4 rounded-full p-1 text-gray-500 hover:bg-gray-100"
@@ -109,9 +124,7 @@ export function AddZoneForm({ onCancel }: Props) {
             </button>
 
             <h2 className="text-xl font-semibold">Add Zone</h2>
-            <p className="mt-1 text-sm text-gray-600">
-                Create a new zone and assign devices, items, and members
-            </p>
+            <p className="mt-1 text-sm text-gray-600">Create a new zone and assign devices, items, and members</p>
 
             <div className="mt-4">
                 <label className="mb-1 block text-sm font-medium text-gray-700">Zone Name</label>
@@ -124,40 +137,64 @@ export function AddZoneForm({ onCancel }: Props) {
             </div>
 
             <div className="mt-4 flex gap-1 rounded-full bg-gray-100 p-1">
-                <TabButton
-                    label={`Devices (${devicesCount})`}
-                    active={tab === 'devices'}
-                    onClick={() => setTab('devices')}
-                />
-                <TabButton
-                    label={`Items (${itemsCount})`}
-                    active={tab === 'items'}
-                    onClick={() => setTab('items')}
-                />
-                <TabButton
-                    label={`Members (${membersCount})`}
-                    active={tab === 'members'}
-                    onClick={() => setTab('members')}
-                />
+                <TabButton label="NFC" active={tab === 'nfc'} onClick={() => setTab('nfc')} />
+                <TabButton label={`Devices (${devicesCount})`} active={tab === 'devices'} onClick={() => setTab('devices')} />
+                <TabButton label={`Items (${itemsCount})`} active={tab === 'items'} onClick={() => setTab('items')} />
+                <TabButton label={`Members (${membersCount})`} active={tab === 'members'} onClick={() => setTab('members')} />
             </div>
 
-            <div className="mt-4 max-h-[330px] overflow-y-auto rounded-xl border border-gray-200">
-                {options.map((opt) => {
+            <div className="mt-4 max-h-[330px] overflow-y-auto rounded-xl border border-gray-200 bg-white">
+                {options.map((opt: Iot | Item | User) => {
                     const checked = selectedList.includes(opt.id);
+
+                    const hasLocation = "location" in opt;
+                    const disabled = hasLocation && opt.location !== "Unassigned";
+
                     return (
                         <label
                             key={opt.id}
-                            className="flex cursor-pointer items-center gap-3 border-b border-gray-100 px-4 py-3 last:border-b-0"
+                            className={`flex items-center gap-3 border-b border-gray-100 px-4 py-3 last:border-b-0
+                    ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+                `}
                         >
                             <input
                                 type="checkbox"
                                 checked={checked}
-                                onChange={() => toggle(opt.id, selectedList, setter)}
+                                disabled={disabled}
+                                onChange={() => {
+                                    if (tab === "nfc") {
+                                        setterSingle(checked ? null : opt.id);
+                                    } else {
+                                        toggle(opt.id, selectedList, setterArray);
+                                    }
+                                }}
                                 className="h-4 w-4 rounded border-gray-400"
                             />
+
                             <div>
-                                <p className="text-sm font-medium text-gray-900">{opt.title}</p>
-                                <p className="text-xs text-gray-500">{opt.subtitle}</p>
+                                <p className="text-sm font-medium text-gray-900">
+                                    {"firstName" in opt
+                                        ? `${opt.firstName} ${opt.lastName}`
+                                        : opt.name}
+                                </p>
+
+                                <p className="text-xs text-gray-500">
+                                    {"position" in opt
+                                        ? opt.position
+                                        : "serialNumber" in opt
+                                            ? opt.serialNumber
+                                            : "code" in opt
+                                                ? opt.code
+                                                : ""}
+                                </p>
+
+                                {hasLocation && (
+                                    <p className="text-[11px] text-gray-600">
+                                        {opt.location != "Unassigned" ?
+                                            `Assigned to ${opt.location}`
+                                            : opt.location}
+                                    </p>
+                                )}
                             </div>
                         </label>
                     );

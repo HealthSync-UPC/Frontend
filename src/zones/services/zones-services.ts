@@ -16,7 +16,15 @@ export class ZonesServices {
     }
 
     async addZone(zone: Zone) {
-        return http.post<Zone>(this.endpoint, zone);
+        const data = {
+            name: zone.name,
+            deviceId: zone.devices.find(d => d.type === 'ACCESS_NFC')!.id,
+            deviceIds: zone.devices.filter(d => d.type !== 'ACCESS_NFC').map(d => d.id),
+            itemIds: zone.items.map(i => i.id),
+            memberIds: zone.members.map(m => m.id)
+        }
+
+        return http.post<Zone>(this.endpoint, data);
     }
 
     async deleteZone(zone: Zone) {

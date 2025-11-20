@@ -27,9 +27,10 @@ const AccessBadge = ({ type }: { type: 'granted' | 'denied' }) => {
     );
 };
 
-function ZoneTable({ onOpenDetails }: { onOpenDetails: () => void }) {
+function ZoneTable({ query, onOpenDetails }: { query: string; onOpenDetails: () => void }) {
     const { zones } = useGlobalStore();
     const { setSelectedZone } = useZoneStore();
+    const filteredZones = zones.filter((z) => z.name.toLowerCase().includes(query.toLowerCase()));
 
     return (
         <Card className="xl:col-span-2">
@@ -52,7 +53,7 @@ function ZoneTable({ onOpenDetails }: { onOpenDetails: () => void }) {
                         </tr>
                     </thead>
                     <tbody className="divide-y">
-                        {zones.map((z) => (
+                        {filteredZones.map((z) => (
                             <tr key={z.id} className="align-middle">
                                 <td className="py-4 pr-4">
                                     <div className="flex items-center gap-2">
@@ -83,7 +84,7 @@ function ZoneTable({ onOpenDetails }: { onOpenDetails: () => void }) {
                                 </td>
                             </tr>
                         ))}
-                        {zones.length === 0 && (
+                        {filteredZones.length === 0 && (
                             <tr>
                                 <td className="py-6 text-center text-sm text-gray-500" colSpan={5}>
                                     No zones match your search
@@ -138,10 +139,10 @@ function RecentAccess() {
     );
 }
 
-export function ZoneMainSection({ onOpenDetails }: { onOpenDetails: () => void }) {
+export function ZoneMainSection({ query, onOpenDetails }: { query: string; onOpenDetails: () => void }) {
     return (
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-            <ZoneTable onOpenDetails={onOpenDetails} />
+            <ZoneTable query={query} onOpenDetails={onOpenDetails} />
             <RecentAccess />
         </div>
     );

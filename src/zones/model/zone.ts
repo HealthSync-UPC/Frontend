@@ -55,26 +55,26 @@ import type { AccessLog } from "./access-log";
 import type { Member } from "./member";
 
 export class Zone {
-    id: number;
-    name: string;
-    devices: Iot[];
-    items: Item[];
-    members: Member[];
-    accessLogs: AccessLog[];
+  id: number;
+  name: string;
+  devices: Iot[];
+  items: Item[];
+  members: Member[];
+  accessLogs: AccessLog[];
 
-    constructor(
-        id: number,
-        name: string,
-        devices: Iot[],
-        items: Item[],
-        members: Member[],
-        accessLogs: AccessLog[]
-    ) {
-        this.id = id;
-        this.name = name;
-        this.devices = devices;
-        this.items = items;
-        this.members = members;
-        this.accessLogs = accessLogs;
-    }
+  constructor(
+    id: number,
+    name: string,
+    devices: Iot[],
+    items: Item[],
+    members: Member[],
+    accessLogs: AccessLog[]
+  ) {
+    this.id = id;
+    this.name = name;
+    this.devices = devices;
+    this.items = items;
+    this.members = members;
+    this.accessLogs = accessLogs;
+  }
 }

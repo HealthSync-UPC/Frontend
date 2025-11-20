@@ -1,34 +1,15 @@
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
-import TuneIcon from '@mui/icons-material/Tune';
 import { useState } from 'react';
 import { AddZoneModal } from '../components/add-zone/AddZoneModal';
-import { FilterModal, type ZoneFilters } from '../components/FilterModal';
 import { ZoneDetailsModal } from '../components/zone-details/ZoneDetailsModal';
 import { ZoneMainSection } from '../components/ZoneMainSection';
 import { ZoneStats } from '../components/ZoneStats';
 
-const DEFAULT_FILTERS: ZoneFilters = {
-    status: 'All Statuses',
-    location: 'All Locations',
-    dateRange: 'All Time',
-};
-
 export default function ZoneManagementPage() {
     const [query, setQuery] = useState('');
     const [openAddZone, setOpenAddZone] = useState(false);
-    const [openFilters, setOpenFilters] = useState(false);
     const [openDetails, setOpenDetails] = useState(false);
-    const [filters, setFilters] = useState<ZoneFilters>(DEFAULT_FILTERS);
-
-    const handleApplyFilters = (f: ZoneFilters) => {
-        setFilters(f);
-        setOpenFilters(false);
-    };
-
-    const handleResetFilters = () => {
-        setFilters(DEFAULT_FILTERS);
-    };
 
     return (
         <div className="flex flex-col gap-6">
@@ -61,13 +42,6 @@ export default function ZoneManagementPage() {
                         className="h-11 w-full rounded-lg border border-gray-300 pl-10 pr-3 text-sm"
                     />
                 </div>
-                <button
-                    onClick={() => setOpenFilters(true)}
-                    className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50"
-                >
-                    <TuneIcon fontSize="small" />
-                    Filter
-                </button>
                 <button className="rounded-lg border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50">
                     Export
                 </button>
@@ -75,19 +49,10 @@ export default function ZoneManagementPage() {
 
             {/* Stats + main content */}
             <ZoneStats />
-            <ZoneMainSection onOpenDetails={() => setOpenDetails(true)} />
+            <ZoneMainSection query={query} onOpenDetails={() => setOpenDetails(true)} />
 
             {/* Modales */}
             <AddZoneModal open={openAddZone} onClose={() => setOpenAddZone(false)} />
-
-            <FilterModal
-                open={openFilters}
-                filters={filters}
-                onApply={handleApplyFilters}
-                onReset={handleResetFilters}
-                onClose={() => setOpenFilters(false)}
-            />
-
             <ZoneDetailsModal open={openDetails} onClose={() => setOpenDetails(false)} />
         </div>
     );
