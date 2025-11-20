@@ -89,5 +89,3 @@ export function InventoryPage() {
         </div>
     );
 }
-
-export default InventoryPage;

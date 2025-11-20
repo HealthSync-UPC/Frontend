@@ -1,49 +1,37 @@
-import { useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
-
-type Member = {
-    id: number;
-    initials: string;
-    name: string;
-    role: string;
-    department: string;
-};
+import { Modal } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { useZoneStore } from '../../../stores/zone-store';
+import { useGlobalStore } from '../../../../shared/stores/globalstore';
+import { Member } from '../../../model/member';
 
 type Props = {
     open: boolean;
-    zoneName: string;
-    initialSelectedIds: number[];
     onClose: () => void;
 };
 
-const ALL_MEMBERS: Member[] = [
-    { id: 1, initials: 'DSJ', name: 'Dr. Sarah Johnson', role: 'Doctor', department: 'Emergency' },
-    { id: 2, initials: 'PMC', name: 'Pharmacist Mike Chen', role: 'Pharmacist', department: 'Pharmacy' },
-    { id: 3, initials: 'NER', name: 'Nurse Emily Rodriguez', role: 'Nurse', department: 'ICU' },
-    { id: 4, initials: 'LIJS', name: 'Lab Tech John Smith', role: 'Lab Technician', department: 'Laboratory' },
-    { id: 5, initials: 'DMG', name: 'Dr. Maria Garcia', role: 'Doctor', department: 'Surgery' },
-];
-
-export function AssignMembersModal({ open, zoneName, initialSelectedIds, onClose }: Props) {
+export function AssignMembersModal({ open, onClose }: Props) {
     const [query, setQuery] = useState('');
+    const [original, setOriginal] = useState<number[]>([]);
     const [selected, setSelected] = useState<number[]>([]);
+    const { selectedZone, setSelectedZone, getZoneById } = useZoneStore();
+    const { profiles, addMemberToZone, removeMemberFromZone } = useGlobalStore();
 
     useEffect(() => {
-        if (open) {
-            setSelected(initialSelectedIds);
-        }
-    }, [open, initialSelectedIds]);
+        const assignedMemberIds = profiles.filter(p =>
+            selectedZone?.members.some(m => m.id === p.id)
+        ).map(p => p.id);
 
-    if (!open) return null;
+        setOriginal(assignedMemberIds);
+        setSelected(assignedMemberIds);
+    }, [open]);
 
-    const filtered = ALL_MEMBERS.filter(
-        (m) =>
-            m.name.toLowerCase().includes(query.toLowerCase()) ||
-            m.role.toLowerCase().includes(query.toLowerCase()) ||
-            m.department.toLowerCase().includes(query.toLowerCase())
+    const filteredProfiles = profiles.filter(m =>
+        (m.firstName + " " + m.lastName).toLowerCase().includes(query.toLowerCase()) ||
+        m.position.toLowerCase().includes(query.toLowerCase())
     );
 
-    const toggleMember = (id: number) => {
+    const toggle = (id: number) => {
         setSelected((prev) =>
             prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
         );
@@ -51,13 +39,41 @@ export function AssignMembersModal({ open, zoneName, initialSelectedIds, onClose
 
     const clearAll = () => setSelected([]);
 
-    const save = () => {
-        console.log('Members saved:', selected);
+    const handleSave = async () => {
+        const added = selected.filter(x => !original.includes(x));
+        const removed = original.filter(x => !selected.includes(x));
+
+        if (added.length > 0) {
+            for (const memberId of added) {
+                const profile = profiles.find(p => p.id === memberId);
+
+                if (profile) {
+                    const member = new Member(profile.id, "");
+                    await addMemberToZone(selectedZone!, member);
+                }
+            }
+        }
+
+        if (removed.length > 0) {
+            for (const memberId of removed) {
+                const profile = profiles.find(p => p.id === memberId);
+
+                if (profile) {
+                    const member = new Member(profile.id, "");
+                    await removeMemberFromZone(selectedZone!, member);
+                }
+            }
+        }
+
+        const updatedZone = await getZoneById(selectedZone!.id);
+        setSelectedZone(updatedZone);
         onClose();
     };
 
+
+
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <Modal open={open} onClose={onClose} className='flex justify-center items-center'>
             <div className="relative max-h-[85vh] w-full max-w-lg overflow-hidden rounded-2xl bg-white p-6 shadow-xl">
 
                 {/* Close */}
@@ -71,7 +87,7 @@ export function AssignMembersModal({ open, zoneName, initialSelectedIds, onClose
                 {/* Title */}
                 <h2 className="mb-1 text-xl font-semibold">Assign Members</h2>
                 <p className="mb-4 text-sm text-gray-600">
-                    Authorize members to access {zoneName}
+                    Authorize members to access {selectedZone?.name}
                 </p>
 
                 {/* Search */}
@@ -85,7 +101,7 @@ export function AssignMembersModal({ open, zoneName, initialSelectedIds, onClose
 
                 {/* Members List */}
                 <div className="max-h-[45vh] overflow-y-auto space-y-3 pr-1">
-                    {filtered.map((m) => (
+                    {filteredProfiles.map((m) => (
                         <div
                             key={m.id}
                             className="flex items-center gap-3 rounded-xl border p-4"
@@ -93,24 +109,17 @@ export function AssignMembersModal({ open, zoneName, initialSelectedIds, onClose
                             <input
                                 type="checkbox"
                                 checked={selected.includes(m.id)}
-                                onChange={() => toggleMember(m.id)}
+                                onChange={() => toggle(m.id)}
                                 className="h-5 w-5"
                             />
-
-                            {/* Avatar circle */}
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white font-medium">
-                                {m.initials}
-                            </div>
-
                             <div>
-                                <p className="font-medium">{m.name}</p>
-                                <p className="text-sm text-gray-600">
-                                    {m.role} • {m.department}
-                                </p>
+                                <p className="font-medium">{m.firstName + " " + m.lastName}</p>
+                                <p className="text-sm text-gray-600">{m.position}</p>
                             </div>
                         </div>
                     ))}
                 </div>
+
 
                 {/* Footer */}
                 <div className="mt-4 flex items-center justify-between border-t pt-4">
@@ -136,7 +145,7 @@ export function AssignMembersModal({ open, zoneName, initialSelectedIds, onClose
                     </button>
 
                     <button
-                        onClick={save}
+                        onClick={handleSave}
                         className="rounded-md bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800"
                     >
                         Save Changes
@@ -144,6 +153,6 @@ export function AssignMembersModal({ open, zoneName, initialSelectedIds, onClose
                 </div>
 
             </div>
-        </div>
+        </Modal>
     );
 }

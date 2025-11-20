@@ -1,14 +1,13 @@
-/* import { useGlobalStore } from '../../shared/stores/globalstore'; */
-import type { Member } from '../model/member';
-import type { Zone } from '../model/zone';
+import { useGlobalStore } from '../../../shared/stores/globalstore';
+import type { Member } from '../../model/member';
+import { useZoneStore } from '../../stores/zone-store';
 
-type Props = {
-    zone: Zone;
-    members: Member[];
-};
 
-export function ZoneMembersTab({ zone, members }: Props) {
-    /* const { removeMemberFromZone } = useGlobalStore(); */
+export function ZoneMembersTab() {
+    const { removeMemberFromZone } = useGlobalStore();
+    const { selectedZone, setSelectedZone } = useZoneStore();
+    const members = selectedZone?.members || [];
+
     if (members.length === 0) {
         return (
             <div className="p-4 text-sm text-gray-500">
@@ -18,9 +17,8 @@ export function ZoneMembersTab({ zone, members }: Props) {
     }
 
     const handleRemoveMember = async (member: Member) => {
-        console.log('Remove member from zone', member, zone);
-        /*  alert('Member removed (mock)');
-         await removeMemberFromZone(zone, member); */
+        const updatedZone = await removeMemberFromZone(selectedZone!!, member);
+        setSelectedZone(updatedZone);
     }
 
     return (
