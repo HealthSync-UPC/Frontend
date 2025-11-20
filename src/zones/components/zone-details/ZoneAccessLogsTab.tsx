@@ -1,5 +1,4 @@
 import dayjs from 'dayjs';
-import type { AccessLog } from '../../model/access-log';
 import { useZoneStore } from '../../stores/zone-store';
 
 const AccessBadge = ({ type }: { type: 'granted' | 'denied' }) => {

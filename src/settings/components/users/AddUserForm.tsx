@@ -42,6 +42,7 @@ export function AddUserForm({ open, onClose }: AddUserFormProps) {
             setLoading(true);
 
             const newUser = new UserModel(
+                0,
                 firstName,
                 lastName,
                 email,

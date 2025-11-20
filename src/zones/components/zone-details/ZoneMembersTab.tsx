@@ -18,7 +18,7 @@ export function ZoneMembersTab() {
 
     const handleRemoveMember = async (member: Member) => {
         const updatedZone = await removeMemberFromZone(selectedZone!!, member);
-        setSelectedZone(updatedZone);
+        setSelectedZone(updatedZone!!);
     }
 
     return (
