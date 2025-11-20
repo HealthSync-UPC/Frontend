@@ -12,6 +12,7 @@ import { ReadingsModal } from '../components/ReadingsModal';
 import { useGlobalStore } from '../../shared/stores/globalstore';
 import type { Iot } from '../model/iot';
 import { AddReadingModal } from '../components/AddReadingModal';
+import { Pagination } from '@mui/material';
 
 export function IoTPage() {
     const { devices } = useGlobalStore();
@@ -20,6 +21,11 @@ export function IoTPage() {
     const [openReadings, setOpenReadings] = useState(false);
     const [selectedDevice, setSelectedDevice] = useState<Iot | null>(null);
     const [openAddReading, setOpenAddReading] = useState(false);
+    const [page, setPage] = useState(1);
+    const pageSize = 5;
+
+    const totalPages = Math.ceil(devices.length / pageSize);
+    const visibleDevices = devices.slice((page - 1) * pageSize, page * pageSize);
 
     const totalDevices = devices.length;
     const onlineCount = devices.filter(device => device.status === 'ONLINE').length;
@@ -89,14 +95,19 @@ export function IoTPage() {
             </div>
 
             {/* Tabla con callback */}
-            <TableIoT
-                devices={devices}
-                onViewReadings={handleViewReadings}
-                onAddReading={(device) => {
-                    setSelectedDevice(device);
-                    setOpenAddReading(true);
-                }}
-            />
+            <div className='flex flex-col items-center gap-5'>
+                <div className='w-full'>
+                    <TableIoT
+                        devices={visibleDevices}
+                        onViewReadings={handleViewReadings}
+                        onAddReading={(device) => {
+                            setSelectedDevice(device);
+                            setOpenAddReading(true);
+                        }}
+                    />
+                </div>
+                <Pagination count={totalPages} page={page} onChange={(_, value) => setPage(value)} />
+            </div>
 
             {/* Modal para crear device */}
             <AddDeviceModal

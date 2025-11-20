@@ -1,8 +1,9 @@
-import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
 import Groups2OutlinedIcon from '@mui/icons-material/Groups2Outlined';
-import MemoryOutlinedIcon from '@mui/icons-material/MemoryOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+import MemoryOutlinedIcon from '@mui/icons-material/MemoryOutlined';
+import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
 import type { ReactNode } from 'react';
+import { useGlobalStore } from '../../shared/stores/globalstore';
 
 const Card = ({ children, className = '' }: { children: ReactNode; className?: string }) => (
     <div className={`rounded-xl border border-gray-200 bg-white p-5 ${className}`}>{children}</div>
@@ -28,15 +29,14 @@ const StatCard = ({
         <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
     </Card>
 );
+export function ZoneStats() {
+    const { zones } = useGlobalStore();
 
-type Props = {
-    totalZones: number;
-    totalMembers: number;
-    devices: number;
-    items: number;
-};
+    const totalZones = zones.length;
+    const totalMembers = zones.reduce((acc, zone) => acc + zone.members.length, 0);
+    const devices = zones.reduce((acc, zone) => acc + zone.devices.length, 0);
+    const items = zones.reduce((acc, zone) => acc + zone.items.length, 0);
 
-export function ZoneStats({ totalZones, totalMembers, devices, items }: Props) {
     return (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
             <StatCard

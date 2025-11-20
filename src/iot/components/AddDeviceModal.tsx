@@ -7,7 +7,7 @@ interface AddDeviceFormValues {
     name: string;
     serialNumber: string;
     type: string;
-    location: string;
+    /* location: string; */
     status: string;
     unit: string;
 }
@@ -22,7 +22,7 @@ export function AddDeviceModal({ open, onClose }: AddDeviceFormProps) {
         name: '',
         serialNumber: '',
         type: 'TEMPERATURE',
-        location: '',
+        /* location: '', */
         status: 'ONLINE',
         unit: '°C',
     });
@@ -65,9 +65,9 @@ export function AddDeviceModal({ open, onClose }: AddDeviceFormProps) {
             };
 
     const handleSubmit = async () => {
-        const { name, serialNumber, type, location, status, unit } = form;
+        const { name, serialNumber, type, /* location, */ status, unit } = form;
 
-        if (!name || !serialNumber || !type || !location || !status) {
+        if (!name || !serialNumber || !type || /* !location || */ !status) {
             return;
         }
 
@@ -81,7 +81,7 @@ export function AddDeviceModal({ open, onClose }: AddDeviceFormProps) {
                 name,
                 serialNumber,
                 type,
-                location,
+                "",
                 status,
                 finalUnit,
                 []
@@ -93,7 +93,7 @@ export function AddDeviceModal({ open, onClose }: AddDeviceFormProps) {
                 name: '',
                 serialNumber: '',
                 type: 'TEMPERATURE',
-                location: '',
+                /* location: '', */
                 status: 'ONLINE',
                 unit: '°C',
             });
@@ -130,52 +130,54 @@ export function AddDeviceModal({ open, onClose }: AddDeviceFormProps) {
                     </button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className='flex flex-col gap-5'>
+                    <div className='flex gap-5'>
+                        {/* Name */}
+                        <div className='flex-1'>
+                            <label className="block text-sm font-medium text-[#67737C] mb-1">
+                                Device Name
+                            </label>
+                            <input
+                                placeholder="e.g. Cold Storage A Monitor"
+                                value={form.name}
+                                onChange={onChange('name')}
+                                className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00648E] focus:border-transparent"
+                            />
+                        </div>
 
-                    {/* Name */}
-                    <div>
-                        <label className="block text-sm font-medium text-[#67737C] mb-1">
-                            Device Name
-                        </label>
-                        <input
-                            placeholder="e.g. Cold Storage A Monitor"
-                            value={form.name}
-                            onChange={onChange('name')}
-                            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00648E] focus:border-transparent"
-                        />
+                        {/* Serial Number */}
+                        <div className='flex-1'>
+                            <label className="block text-sm font-medium text-[#67737C] mb-1">
+                                Serial Number
+                            </label>
+                            <input
+                                placeholder="e.g. TEMP-001"
+                                value={form.serialNumber}
+                                onChange={onChange('serialNumber')}
+                                className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00648E] focus:border-transparent"
+                            />
+                        </div>
                     </div>
 
-                    {/* Serial Number */}
-                    <div>
-                        <label className="block text-sm font-medium text-[#67737C] mb-1">
-                            Serial Number
-                        </label>
-                        <input
-                            placeholder="e.g. TEMP-001"
-                            value={form.serialNumber}
-                            onChange={onChange('serialNumber')}
-                            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00648E] focus:border-transparent"
-                        />
-                    </div>
+                    <div className='flex gap-5'>
+                        {/* Type */}
+                        <div className='flex-1'>
+                            <label className="block text-sm font-medium text-[#67737C] mb-1">
+                                Type
+                            </label>
+                            <select
+                                value={form.type}
+                                onChange={onChange('type')}
+                                className="w-full border rounded px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#00648E] focus:border-transparent"
+                            >
+                                <option value="TEMPERATURE">Temperature</option>
+                                <option value="HUMIDITY">Humidity</option>
+                                <option value="ACCESS_NFC">Access NFC</option>
+                            </select>
+                        </div>
 
-                    {/* Type */}
-                    <div>
-                        <label className="block text-sm font-medium text-[#67737C] mb-1">
-                            Type
-                        </label>
-                        <select
-                            value={form.type}
-                            onChange={onChange('type')}
-                            className="w-full border rounded px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#00648E] focus:border-transparent"
-                        >
-                            <option value="TEMPERATURE">Temperature</option>
-                            <option value="HUMIDITY">Humidity</option>
-                            <option value="ACCESS_NFC">Access NFC</option>
-                        </select>
-                    </div>
-
-                    {/* Location */}
-                    <div>
+                        {/* Location */}
+                        {/* <div>
                         <label className="block text-sm font-medium text-[#67737C] mb-1">
                             Location
                         </label>
@@ -185,22 +187,23 @@ export function AddDeviceModal({ open, onClose }: AddDeviceFormProps) {
                             onChange={onChange('location')}
                             className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00648E] focus:border-transparent"
                         />
-                    </div>
+                    </div> */}
 
-                    {/* Status */}
-                    <div>
-                        <label className="block text-sm font-medium text-[#67737C] mb-1">
-                            Status
-                        </label>
-                        <select
-                            value={form.status}
-                            onChange={onChange('status')}
-                            className="w-full border rounded px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#00648E] focus:border-transparent"
-                        >
-                            <option value="ONLINE">Online</option>
-                            <option value="OFFLINE">Offline</option>
-                            <option value="WARNING">Warning</option>
-                        </select>
+                        {/* Status */}
+                        <div className='flex-1'>
+                            <label className="block text-sm font-medium text-[#67737C] mb-1">
+                                Status
+                            </label>
+                            <select
+                                value={form.status}
+                                onChange={onChange('status')}
+                                className="w-full border rounded px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#00648E] focus:border-transparent"
+                            >
+                                <option value="ONLINE">Online</option>
+                                <option value="OFFLINE">Offline</option>
+                                <option value="WARNING">Warning</option>
+                            </select>
+                        </div>
                     </div>
 
                     {/* Unit */}
@@ -219,7 +222,7 @@ export function AddDeviceModal({ open, onClose }: AddDeviceFormProps) {
                     </div>
                 </div>
 
-                <div className="flex justify-end gap-3">
+                <div className="flex justify-end gap-3 mt-5">
                     <button
                         onClick={onClose}
                         className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"

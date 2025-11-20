@@ -14,7 +14,7 @@ import type { Category } from "../../inventory/model/category";
 import type { Item } from "../../inventory/model/item";
 import { inventoryService } from "../../inventory/service/inventory-service";
 import type { Member } from "../../zones/model/member";
-import type { Zone } from "../../zones/model/zone";
+import { Zone } from "../../zones/model/zone";
 import { zonesService } from "../../zones/services/zones-services";
 interface GlobalState {
     // IAM
@@ -350,25 +350,32 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
             const response = await zonesService.addMemberToZone(zone, member);
             if (response.data) {
                 set(state => {
-                    state.zones.push(response.data);
+                    state.zones = state.zones.map(z =>
+                        z.id === response.data.id ? response.data : z
+                    );
                 });
                 console.log(`Added member with id: ${member.id} to zone with id: ${zone.id}`);
             }
         } catch (error) {
             console.error("Error adding member to zone:", error);
+            throw error;
         }
     },
     removeMemberFromZone: async (zone: Zone, member: Member) => {
         try {
             const response = await zonesService.removeMemberFromZone(zone, member);
-            if (response.status == 204) {
-                set(state => {
-                    state.zones = state.zones.filter(z => z.id !== zone.id);
-                });
+            if (response.status == 200) {
+                const updatedZone = response.data;
+                const updatedZones = get().zones.map(z =>
+                    z.id === updatedZone.id ? updatedZone : z
+                );
+
+                set(state => { state.zones = updatedZones; });
                 console.log(`Removed member with id: ${member.id} from zone with id: ${zone.id}`);
             }
         } catch (error) {
             console.error("Error removing member from zone:", error);
+            throw error;
         }
     },
     addItemToZone: async (zone: Zone, item: Item) => {
@@ -376,25 +383,31 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
             const response = await zonesService.addItemToZone(zone, item);
             if (response.data) {
                 set(state => {
-                    state.zones.push(response.data);
+                    state.zones = state.zones.map(z =>
+                        z.id === response.data.id ? response.data : z
+                    );
                 });
                 console.log(`Added item with id: ${item.id} to zone with id: ${zone.id}`);
             }
         } catch (error) {
             console.error("Error adding item to zone:", error);
+            throw error;
         }
     },
     removeItemFromZone: async (zone: Zone, item: Item) => {
         try {
             const response = await zonesService.removeItemFromZone(zone, item);
-            if (response.status == 204) {
+            if (response.status == 200) {
                 set(state => {
-                    state.zones = state.zones.filter(z => z.id !== zone.id);
+                    state.zones = state.zones.map(z =>
+                        z.id === response.data.id ? response.data : z
+                    );
                 });
                 console.log(`Removed item with id: ${item.id} from zone with id: ${zone.id}`);
             }
         } catch (error) {
             console.error("Error removing item from zone:", error);
+            throw error;
         }
     },
     addIotToZone: async (zone: Zone, iot: Iot) => {
@@ -402,26 +415,32 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
             const response = await zonesService.addIotToZone(zone, iot);
             if (response.data) {
                 set(state => {
-                    state.zones.push(response.data);
+                    state.zones = state.zones.map(z =>
+                        z.id === response.data.id ? response.data : z
+                    );
                 });
                 console.log(`Added IoT with id: ${iot.id} to zone with id: ${zone.id}`);
             }
         } catch (error) {
             console.error("Error adding IoT to zone:", error);
+            throw error;
         }
     },
     removeIotFromZone: async (zone: Zone, iot: Iot) => {
         try {
             const response = await zonesService.removeIotFromZone(zone, iot);
-            if (response.status == 204) {
+            if (response.status == 200) {
                 set(state => {
-                    state.zones = state.zones.filter(z => z.id !== zone.id);
+                    state.zones = state.zones.map(z =>
+                        z.id === response.data.id ? response.data : z
+                    );
                 });
                 console.log(`Removed IoT with id: ${iot.id} from zone with id: ${zone.id}`);
             }
         }
         catch (error) {
             console.error("Error removing IoT from zone:", error);
+            throw error;
         }
     },
     tryAccess: async (zone: Zone, member: Member) => {

@@ -1,10 +1,9 @@
-import type { Item } from '../../inventory/model/item';
+import { useZoneStore } from "../../stores/zone-store";
 
-type Props = {
-    items: Item[];
-};
+export function ZoneItemsTab() {
+    const { selectedZone } = useZoneStore();
+    const items = selectedZone?.items || [];
 
-export function ZoneItemsTab({ items }: Props) {
     if (items.length === 0) {
         return (
             <div className="p-4 text-sm text-gray-500">

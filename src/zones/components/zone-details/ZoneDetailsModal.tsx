@@ -1,35 +1,34 @@
-import { useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
-import SensorsOutlinedIcon from '@mui/icons-material/SensorsOutlined';
-import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import Groups2OutlinedIcon from '@mui/icons-material/Groups2Outlined';
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+import SensorsOutlinedIcon from '@mui/icons-material/SensorsOutlined';
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
-import { AssignDevicesModal } from './AssignDevicesModal';
-import { AssignItemsModal } from './AssignItemsModal';
-import { AssignMembersModal } from './AssignMembersModal';
-import { EditZoneModal } from './EditZoneModal';
+import { Modal } from '@mui/material';
+import { useState } from 'react';
+import { AssignDevicesModal } from './add-modals/AssignDevicesModal';
+import { AssignItemsModal } from './add-modals/AssignItemsModal';
+import { AssignMembersModal } from './add-modals/AssignMembersModal';
+/* import { EditZoneModal } from './add-modals/EditZoneModal'; */
+import { ZoneAccessLogsTab } from './ZoneAccessLogsTab';
 import { ZoneDevicesTab } from './ZoneDevicesTab';
 import { ZoneItemsTab } from './ZoneItemsTab';
 import { ZoneMembersTab } from './ZoneMembersTab';
-import { ZoneAccessLogsTab } from './ZoneAccessLogsTab';
-import type { Zone } from '../model/zone';
+import { useZoneStore } from '../../stores/zone-store';
 
 type TabKey = 'devices' | 'items' | 'members' | 'access';
 
 type ZoneDetailsModalProps = {
     open: boolean;
-    zone: Zone;
     onClose: () => void;
 };
 
-export function ZoneDetailsModal({ open, zone, onClose }: ZoneDetailsModalProps) {
+export function ZoneDetailsModal({ open, onClose }: ZoneDetailsModalProps) {
     const [activeTab, setActiveTab] = useState<TabKey>('devices');
     const [openAssignDevices, setOpenAssignDevices] = useState(false);
     const [openAssignItems, setOpenAssignItems] = useState(false);
     const [openAssignMembers, setOpenAssignMembers] = useState(false);
-    const [openEditZone, setOpenEditZone] = useState(false);
-
-    if (!open || !zone) return null;
+    /* const [openEditZone, setOpenEditZone] = useState(false); */
+    const { selectedZone } = useZoneStore();
 
     const TabButton = ({
         label,
@@ -54,23 +53,16 @@ export function ZoneDetailsModal({ open, zone, onClose }: ZoneDetailsModalProps)
         </button>
     );
 
-    const handleEditSave = (data: { name: string; description: string }) => {
-        // Mock: solo mostramos en consola
-        console.log('Zone updated (mock): ', data);
-        setOpenEditZone(false);
-        // Si manejas las zonas desde un estado en el padre,
-        // ahí es donde realmente deberías actualizar el nombre.
-    };
+    //TODO
+    /*  const handleEditSave = (data: { name: string; description: string }) => {
+         console.log('Zone updated (mock): ', data);
+         setOpenEditZone(false);
+     }; */
 
     return (
         <>
-            {/* Overlay del details */}
-            <div className="fixed inset-0 bg-black/40 z-40" onClick={onClose} />
-
-            {/* Card principal */}
-            <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-                <div className="w-full max-w-3xl rounded-2xl bg-white p-6 shadow-xl relative">
-                    {/* Close */}
+            <Modal open={open} onClose={onClose} className='flex justify-center items-center'>
+                <div className="relative max-h-[90vh] w-full max-w-3xl rounded-2xl bg-white p-6 shadow-xl">
                     <button
                         onClick={onClose}
                         className="absolute right-4 top-4 text-gray-500 hover:text-gray-700"
@@ -78,53 +70,48 @@ export function ZoneDetailsModal({ open, zone, onClose }: ZoneDetailsModalProps)
                         <CloseIcon />
                     </button>
 
-                    {/* Header */}
                     <p className="text-xl font-semibold flex items-center gap-2">
-                        {zone.name}
+                        {selectedZone?.name}
                     </p>
                     <p className="text-sm text-gray-500 mb-5">
-                        Zone ID: {zone.id} • View and manage zone details
+                        Zone ID: {selectedZone?.id} • View and manage zone details
                     </p>
 
-                    {/* Tabs */}
                     <div className="flex items-center gap-3 border-b pb-3">
                         <TabButton
-                            label={`Devices (${zone.devices.length})`}
+                            label={`Devices (${selectedZone?.devices.length})`}
                             icon={<SensorsOutlinedIcon fontSize="small" />}
                             isActive={activeTab === 'devices'}
                             onClick={() => setActiveTab('devices')}
                         />
                         <TabButton
-                            label={`Items (${zone.items.length})`}
+                            label={`Items (${selectedZone?.items.length})`}
                             icon={<Inventory2OutlinedIcon fontSize="small" />}
                             isActive={activeTab === 'items'}
                             onClick={() => setActiveTab('items')}
                         />
                         <TabButton
-                            label={`Members (${zone.members.length})`}
+                            label={`Members (${selectedZone?.members.length})`}
                             icon={<Groups2OutlinedIcon fontSize="small" />}
                             isActive={activeTab === 'members'}
                             onClick={() => setActiveTab('members')}
                         />
                         <TabButton
-                            label={`Access Logs (${zone.accessLogs.length})`}
+                            label={`Access Logs (${selectedZone?.accessLogs.length})`}
                             icon={<ShieldOutlinedIcon fontSize="small" />}
                             isActive={activeTab === 'access'}
                             onClick={() => setActiveTab('access')}
                         />
                     </div>
 
-                    {/* Contenido */}
                     <div className="mt-4 max-h-[55vh] overflow-y-auto rounded-xl border border-gray-200">
-                        {activeTab === 'devices' && <ZoneDevicesTab devices={zone.devices} />}
-                        {activeTab === 'items' && <ZoneItemsTab items={zone.items} />}
-                        {activeTab === 'members' && <ZoneMembersTab zone={zone} members={zone.members} />}
-                        {activeTab === 'access' && <ZoneAccessLogsTab logs={zone.accessLogs} />}
+                        {activeTab === 'devices' && <ZoneDevicesTab />}
+                        {activeTab === 'items' && <ZoneItemsTab />}
+                        {activeTab === 'members' && <ZoneMembersTab />}
+                        {activeTab === 'access' && <ZoneAccessLogsTab />}
                     </div>
 
-                    {/* Footer */}
                     <div className="mt-4 flex items-center justify-between border-t pt-4">
-                        {/* Botón principal según tab */}
                         {activeTab === 'devices' && (
                             <button
                                 onClick={() => setOpenAssignDevices(true)}
@@ -133,7 +120,6 @@ export function ZoneDetailsModal({ open, zone, onClose }: ZoneDetailsModalProps)
                                 Assign Devices
                             </button>
                         )}
-
                         {activeTab === 'items' && (
                             <button
                                 onClick={() => setOpenAssignItems(true)}
@@ -142,7 +128,6 @@ export function ZoneDetailsModal({ open, zone, onClose }: ZoneDetailsModalProps)
                                 Assign Items
                             </button>
                         )}
-
                         {activeTab === 'members' && (
                             <button
                                 onClick={() => setOpenAssignMembers(true)}
@@ -151,14 +136,12 @@ export function ZoneDetailsModal({ open, zone, onClose }: ZoneDetailsModalProps)
                                 Assign Members
                             </button>
                         )}
-
                         {activeTab === 'access' && (
                             <button className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50">
                                 Export Access Logs
                             </button>
                         )}
 
-                        {/* Botones de acciones */}
                         <div className="ml-4 flex gap-3">
                             <button
                                 onClick={onClose}
@@ -166,49 +149,26 @@ export function ZoneDetailsModal({ open, zone, onClose }: ZoneDetailsModalProps)
                             >
                                 Close
                             </button>
-                            <button
+                            {/*   <button
                                 onClick={() => setOpenEditZone(true)}
                                 className="rounded-md border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50"
                             >
                                 Edit
-                            </button>
+                            </button> */}
                             <button className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">
                                 Delete
                             </button>
                         </div>
                     </div>
                 </div>
-            </div>
+            </Modal>
 
-            {/* Modales secundarios */}
-            <AssignDevicesModal
-                open={openAssignDevices}
-                zoneName={zone.name}
-                initialSelectedIds={zone.devices.map((d: any) => d.id)}
-                onClose={() => setOpenAssignDevices(false)}
-            />
-
-            <AssignItemsModal
-                open={openAssignItems}
-                zoneName={zone.name}
-                initialSelectedCodes={zone.items.map((i: any) => i.code)}
-                onClose={() => setOpenAssignItems(false)}
-            />
-
-            <AssignMembersModal
-                open={openAssignMembers}
-                zoneName={zone.name}
-                initialSelectedIds={zone.members.map((m: any) => m.memberId)}
-                onClose={() => setOpenAssignMembers(false)}
-            />
-
-            {/* Edit Zone */}
-            <EditZoneModal
-                open={openEditZone}
-                initialName={zone.name}
-                onClose={() => setOpenEditZone(false)}
-                onSave={handleEditSave}
-            />
+            <AssignDevicesModal open={openAssignDevices} onClose={() => setOpenAssignDevices(false)} />
+            <AssignItemsModal open={openAssignItems} onClose={() => setOpenAssignItems(false)} />
+            <AssignMembersModal open={openAssignMembers} onClose={() => setOpenAssignMembers(false)} />
+            {/* 
+            <EditZoneModal open={openEditZone} onClose={() => setOpenEditZone(false)} onSave={handleEditSave} /> 
+            */}
         </>
     );
 }
