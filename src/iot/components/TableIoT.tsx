@@ -59,7 +59,7 @@ export function TableIoT({ devices, onViewReadings, onAddReading }: TableIoTProp
                     </div>
 
                     {/* Table */}
-                    <div className="text-[#040C13] text-sm">
+                    <div className="text-[#040C13] text-sm h-85">
 
                         {/* Column titles */}
                         <div className="grid grid-cols-6 font-medium border-b border-[#DFE6EB] pb-2 text-[#67737C]">

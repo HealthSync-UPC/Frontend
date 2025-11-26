@@ -5,7 +5,7 @@ import { ThresholdsSection } from '../components/thresholds/ThresholdsSection';
 
 
 export default function SettingsPage() {
-    const [active, setActive] = useState<TabKey>('users');
+    const [active, setActive] = useState<TabKey>('thresholds');
 
     return (
         <div className="flex flex-col gap-6">
@@ -19,7 +19,7 @@ export default function SettingsPage() {
             <Navbar active={active} onChange={setActive} />
 
             <div className="mt-2">
-                {active === 'users' ? <UsersSection /> : <ThresholdsSection />}
+                {active === 'thresholds' ? <ThresholdsSection /> : <UsersSection />}
             </div>
         </div>
     );

@@ -53,12 +53,6 @@ export function ZoneDetailsModal({ open, onClose }: ZoneDetailsModalProps) {
         </button>
     );
 
-    //TODO
-    /*  const handleEditSave = (data: { name: string; description: string }) => {
-         console.log('Zone updated (mock): ', data);
-         setOpenEditZone(false);
-     }; */
-
     return (
         <>
             <Modal open={open} onClose={onClose} className='flex justify-center items-center'>

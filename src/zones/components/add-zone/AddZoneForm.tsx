@@ -34,7 +34,7 @@ export function AddZoneForm({ onCancel, onSetMessage, onSetOpenSnackBar }: Props
         const membersToAdd = profiles.filter(p => selectedMembers.includes(p.id))
             .map(p => new Member(p.id, p.firstName + ' ' + p.lastName));
 
-        const newZone: Omit<Zone, 'id' | 'accessLogs'> = {
+        const newZone: Pick<Zone, 'name' | 'devices' | 'items' | 'members'> = {
             name: zoneName,
             devices: devicesToAdd,
             items: itemsToAdd,

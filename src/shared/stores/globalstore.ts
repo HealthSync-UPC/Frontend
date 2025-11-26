@@ -65,6 +65,8 @@ interface GlobalState {
     tryAccess: (zone: Zone, member: Member) => Promise<boolean>;
 
     // Settings
+    updateZoneTemperature: (zone: Zone) => Promise<void>;
+    updateZoneHumidity: (zone: Zone) => Promise<void>;
     profiles: Profile[],
     getProfiles: () => Promise<void>;
     addProfile: (profile: Profile) => Promise<void>;
@@ -494,6 +496,36 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
     },
 
     // Settings
+    updateZoneTemperature: async (zone: Zone) => {
+        try {
+            const response = await zonesService.updateZoneTemperature(zone);
+            if (response.data) {
+                set(state => {
+                    state.zones = state.zones.map(z =>
+                        z.id === response.data.id ? response.data : z
+                    );
+                });
+                console.log(`Updated temperature for zone with id: ${zone.id}`);
+            }
+        } catch (error) {
+            console.error("Error updating zone temperature:", error);
+        }
+    },
+    updateZoneHumidity: async (zone: Zone) => {
+        try {
+            const response = await zonesService.updateZoneHumidity(zone);
+            if (response.data) {
+                set(state => {
+                    state.zones = state.zones.map(z =>
+                        z.id === response.data.id ? response.data : z
+                    );
+                });
+                console.log(`Updated humidity for zone with id: ${zone.id}`);
+            }
+        } catch (error) {
+            console.error("Error updating zone humidity:", error);
+        }
+    },
     profiles: [],
     getProfiles: async () => {
         try {

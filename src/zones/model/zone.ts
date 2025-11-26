@@ -61,6 +61,10 @@ export class Zone {
   items: Item[];
   members: Member[];
   accessLogs: AccessLog[];
+  minTemperature: number;
+  maxTemperature: number;
+  minHumidity: number;
+  maxHumidity: number;
 
   constructor(
     id: number,
@@ -68,7 +72,11 @@ export class Zone {
     devices: Iot[],
     items: Item[],
     members: Member[],
-    accessLogs: AccessLog[]
+    accessLogs: AccessLog[],
+    minTemperature: number,
+    maxTemperature: number,
+    minHumidity: number,
+    maxHumidity: number
   ) {
     this.id = id;
     this.name = name;
@@ -76,5 +84,9 @@ export class Zone {
     this.items = items;
     this.members = members;
     this.accessLogs = accessLogs;
+    this.minTemperature = minTemperature;
+    this.maxTemperature = maxTemperature;
+    this.minHumidity = minHumidity;
+    this.maxHumidity = maxHumidity;
   }
 }

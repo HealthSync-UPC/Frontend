@@ -1,10 +1,14 @@
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
-import PersonIcon from '@mui/icons-material/Person';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import WifiIcon from '@mui/icons-material/Wifi';
 import dayjs from "dayjs";
 import { useGlobalStore } from "../../shared/stores/globalstore";
 import { DashboardCard } from "../components/DashboardCard";
+import LinearProgress from '@mui/material/LinearProgress';
+import Avatar from '@mui/material/Avatar';
+import Stack from '@mui/material/Stack';
+import Box from '@mui/material/Box';
 
 export function DashboardPage() {
     const { devices, alerts, items, profiles } = useGlobalStore();
@@ -16,6 +20,18 @@ export function DashboardPage() {
         return expiryDate.isAfter(today) && expiryDate.isBefore(today.add(30, 'day'));
     }).length;
 
+    // helper: latest alert (most recent)
+    const latestAlert = alerts && alerts.length > 0
+        ? [...alerts].sort((a, b) => new Date(b.registeredAt).getTime() - new Date(a.registeredAt).getTime())[0]
+        : null;
+
+    // helper: soonest expiring item
+    const soonestItem = items && items.length > 0
+        ? [...items].filter(it => it.expirationDate).sort((a, b) => new Date(a.expirationDate!).getTime() - new Date(b.expirationDate!).getTime())[0]
+        : null;
+
+    // helper: recent profiles (last 3)
+    const recentProfiles = profiles ? [...profiles].slice(-3).reverse() : [];
 
     return (
         <div className="flex flex-col gap-10">
@@ -40,11 +56,17 @@ export function DashboardPage() {
                     value={`${onlineDevicesCount} / ${devices.length}`}
                     description={`${onlineDevicesPercentage.toFixed(0)}% operational`}
                     extraContent={
-                        <></>
-                        /*  <div className="flex gap-2 text-[#67737C]">
-                             <HorizontalRuleIcon />
-                             <span>0% vs last period</span>
-                         </div> */
+                        <div className="mt-2">
+                            <Box sx={{ width: '100%' }}>
+                                <LinearProgress
+                                    variant="determinate"
+                                    value={onlineDevicesPercentage}
+                                    sx={{ height: 8, borderRadius: 4 }} />
+                            </Box>
+                            <div className="flex justify-between text-sm text-[#67737C] mt-1">
+                                <span>Last check: {dayjs().format('MMM D')}</span>
+                            </div>
+                        </div>
                     }
                     variant="green"
                 />
@@ -55,14 +77,23 @@ export function DashboardPage() {
                     value={alerts.length.toString()}
                     description=""
                     extraContent={
-                        <></>
-                        /*    <div className="flex gap-2">
-                               <div className="text-[#00A63E] flex gap-1">
-                                   <TrendingUpIcon />
-                                   <span>+2</span>
-                               </div>
-                               <span className="text-[#67737C]">vs last period</span>
-                           </div> */
+                        <div className="mt-2 text-sm text-[#67737C]">
+                            {latestAlert ? (
+                                <div className="flex flex-col">
+                                    <div className="flex items-center gap-2">
+                                        <WarningAmberIcon className="text-[#B45309]" />
+                                        <span className="font-medium">{latestAlert.type.replace(/_/g, ' ')}</span>
+                                    </div>
+                                    <div className="text-xs mt-1">
+                                        <span>{latestAlert.location}</span>
+                                        <span className="mx-2">•</span>
+                                        <span>{dayjs(latestAlert.registeredAt).format('MMM D, HH:mm')}</span>
+                                    </div>
+                                </div>
+                            ) : (
+                                <span>No active alerts</span>
+                            )}
+                        </div>
                     }
                     variant="yellow"
                 />
@@ -73,32 +104,40 @@ export function DashboardPage() {
                     value={itemsExpiringSoonCount.toString()}
                     description="Next 30 days"
                     extraContent={
-                        <></>
-                        /* <div className="flex gap-2">
-                            <div className="text-[#E7000B] flex gap-1">
-                                <TrendingDownIcon />
-                                <span>-5</span>
-                            </div>
-                            <span className="text-[#67737C]">vs last period</span>
-                        </div> */
+                        <div className="mt-2 text-sm text-[#67737C]">
+                            {soonestItem ? (
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <div className="font-medium">{soonestItem.name}</div>
+                                        <div className="text-xs">Exp in {dayjs(soonestItem.expirationDate).diff(dayjs(), 'day')} days</div>
+                                    </div>
+                                    <div className="text-xs">Location: {soonestItem.location}</div>
+                                </div>
+                            ) : (
+                                <span>No items expiring soon</span>
+                            )}
+                        </div>
                     }
                     variant="red"
                 />
 
                 <DashboardCard
                     title="Members"
-                    icon={<PersonIcon />}
+                    icon={<PersonOutlineOutlinedIcon />}
                     value={profiles.length.toString()}
                     description=""
                     extraContent={
-                        <></>
-                        /* <div className="flex gap-2">
-                            <div className="text-[#00A63E] flex gap-1">
-                                <TrendingUpIcon />
-                                <span>+1</span>
-                            </div>
-                            <span className="text-[#67737C]">vs last period</span>
-                        </div> */
+                        <div className="mt-2">
+                            {recentProfiles.length > 0 ? (
+                                <Stack direction="row" spacing={1}>
+                                    {recentProfiles.map((p) => (
+                                        <Avatar key={p.id}>{(p.firstName?.[0] || '') + (p.lastName?.[0] || '')}</Avatar>
+                                    ))}
+                                </Stack>
+                            ) : (
+                                <span className="text-sm text-[#67737C]">No members yet</span>
+                            )}
+                        </div>
                     }
                     variant="green"
                 />

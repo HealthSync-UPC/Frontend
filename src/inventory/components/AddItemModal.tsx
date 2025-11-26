@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import { useGlobalStore } from "../../shared/stores/globalstore";
 import type { Item } from "../model/item";
+import dayjs from "dayjs";
 
 type Props = {
     open: boolean;
@@ -11,7 +12,7 @@ type Props = {
 export function AddItemModal({ open, onClose }: Props) {
     const { categories, addItem } = useGlobalStore();
 
-    const [form, setForm] = useState<Omit<Item, "id" | "categoryName">>({
+    const [form, setForm] = useState<Omit<Item, "id" | "categoryName" | "location">>({
         categoryId: 0,
         name: "",
         code: "",
@@ -19,7 +20,6 @@ export function AddItemModal({ open, onClose }: Props) {
         quantity: 0,
         unit: "",
         active: true,
-        location: "",
         expirationDate: undefined
     });
 
@@ -42,7 +42,6 @@ export function AddItemModal({ open, onClose }: Props) {
             form.code,
             form.description,
             form.unit,
-            form.location,
             form.categoryId,
         ];
 
@@ -158,7 +157,7 @@ export function AddItemModal({ open, onClose }: Props) {
                     </div>
 
                     {/* Location */}
-                    <div>
+                    {/*  <div>
                         <label className="block text-sm font-medium text-gray-700">Location</label>
                         <input
                             className="mt-1 h-10 w-full rounded-md border border-gray-300 px-3"
@@ -166,7 +165,7 @@ export function AddItemModal({ open, onClose }: Props) {
                             value={form.location}
                             onChange={(e) => setForm({ ...form, location: e.target.value })}
                         />
-                    </div>
+                    </div> */}
 
                     {/* Expiration Date (optional) */}
                     <div>
@@ -174,7 +173,7 @@ export function AddItemModal({ open, onClose }: Props) {
                         <input
                             type="date"
                             className="mt-1 h-10 w-full rounded-md border border-gray-300 px-3"
-                            value={form.expirationDate ? form.expirationDate.toString().substring(0, 10) : ""}
+                            value={form.expirationDate ? dayjs(form.expirationDate).format("YYYY-MM-DD") : ""}
                             onChange={(e) =>
                                 setForm({
                                     ...form,

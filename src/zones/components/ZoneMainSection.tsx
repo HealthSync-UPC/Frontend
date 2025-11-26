@@ -4,6 +4,8 @@ import dayjs from 'dayjs';
 import type { ReactNode } from 'react';
 import { useGlobalStore } from '../../shared/stores/globalstore';
 import { useZoneStore } from '../stores/zone-store';
+import { useState } from 'react';
+import { Pagination } from '@mui/material';
 
 const Card = ({ children, className = '' }: { children: ReactNode; className?: string }) => (
     <div className={`rounded-xl border border-gray-200 bg-white p-5 ${className}`}>{children}</div>
@@ -30,7 +32,12 @@ const AccessBadge = ({ type }: { type: 'granted' | 'denied' }) => {
 function ZoneTable({ query, onOpenDetails }: { query: string; onOpenDetails: () => void }) {
     const { zones } = useGlobalStore();
     const { setSelectedZone } = useZoneStore();
+    const [page, setPage] = useState(1);
+    const pageSize = 5;
     const filteredZones = zones.filter((z) => z.name.toLowerCase().includes(query.toLowerCase()));
+    const totalPages = Math.max(1, Math.ceil(filteredZones.length / pageSize));
+    if (page > totalPages) setPage(1);
+    const visibleZones = filteredZones.slice((page - 1) * pageSize, page * pageSize);
 
     return (
         <Card className="xl:col-span-2">
@@ -52,47 +59,56 @@ function ZoneTable({ query, onOpenDetails }: { query: string; onOpenDetails: () 
                             <th className="py-3 pr-2 font-medium">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y">
-                        {filteredZones.map((z) => (
-                            <tr key={z.id} className="align-middle">
-                                <td className="py-4 pr-4">
-                                    <div className="flex items-center gap-2">
-                                        <PlaceOutlinedIcon fontSize="small" className="text-gray-500" />
-                                        <span className="font-medium">{z.name}</span>
-                                    </div>
-                                </td>
-                                <td className="py-4 pr-4">
-                                    <CountPill n={z.devices.length} />
-                                </td>
-                                <td className="py-4 pr-4">
-                                    <CountPill n={z.items.length} />
-                                </td>
-                                <td className="py-4 pr-4">
-                                    <CountPill n={z.members.length} />
-                                </td>
-                                <td className="py-4 pr-2">
-                                    <button
-                                        onClick={() => {
-                                            setSelectedZone(z);
-                                            onOpenDetails();
-                                        }}
-                                        className="rounded-md border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50"
-                                    >
-                                        View
-                                    </button>
-
-                                </td>
-                            </tr>
-                        ))}
-                        {filteredZones.length === 0 && (
-                            <tr>
-                                <td className="py-6 text-center text-sm text-gray-500" colSpan={5}>
-                                    No zones match your search
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
                 </table>
+
+                <div className="h-85 overflow-y-auto">
+                    <table className="min-w-full text-sm">
+                        <tbody className="divide-y">
+                            {visibleZones.map((z) => (
+                                <tr key={z.id} className="align-middle">
+                                    <td className="py-4 pr-4">
+                                        <div className="flex items-center gap-2">
+                                            <PlaceOutlinedIcon fontSize="small" className="text-gray-500" />
+                                            <span className="font-medium">{z.name}</span>
+                                        </div>
+                                    </td>
+                                    <td className="py-4 pr-4">
+                                        <CountPill n={z.devices.length} />
+                                    </td>
+                                    <td className="py-4 pr-4">
+                                        <CountPill n={z.items.length} />
+                                    </td>
+                                    <td className="py-4 pr-4">
+                                        <CountPill n={z.members.length} />
+                                    </td>
+                                    <td className="py-4 pr-2">
+                                        <button
+                                            onClick={() => {
+                                                setSelectedZone(z);
+                                                onOpenDetails();
+                                            }}
+                                            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50"
+                                        >
+                                            View
+                                        </button>
+
+                                    </td>
+                                </tr>
+                            ))}
+                            {filteredZones.length === 0 && (
+                                <tr>
+                                    <td className="py-6 text-center text-sm text-gray-500" colSpan={5}>
+                                        No zones match your search
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div className="mt-3 flex justify-center">
+                    <Pagination count={totalPages} page={page} onChange={(_, value) => setPage(value)} />
+                </div>
             </div>
         </Card>
     );

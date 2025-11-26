@@ -1,8 +1,9 @@
-import React, { useState } from "react";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
+import { Pagination } from '@mui/material';
 import dayjs from "dayjs";
-import { SectionCard, Chip } from "./ui";
+import { useState } from "react";
 import { useGlobalStore } from "../../shared/stores/globalstore";
+import { Chip, SectionCard } from "./ui";
 
 type Filters = {
     query: string;
@@ -23,6 +24,8 @@ const TABS: { key: TabKey; label: string; className?: string }[] = [
 
 export function ItemsCard({ filters }: { filters: Filters }) {
     const [tab, setTab] = useState<TabKey>("all");
+    const [page, setPage] = useState(1);
+    const pageSize = 5;
     const { items } = useGlobalStore();
 
     const filteredItems = items
@@ -42,21 +45,9 @@ export function ItemsCard({ filters }: { filters: Filters }) {
             return true;
         });
 
-
-    const ActionButton = ({
-        children,
-        onClick,
-    }: {
-        children: React.ReactNode;
-        onClick?: () => void;
-    }) => (
-        <button
-            onClick={onClick}
-            className="h-9 rounded-md border border-gray-300 px-4 text-sm hover:bg-gray-50"
-        >
-            {children}
-        </button>
-    );
+    const totalPages = Math.max(1, Math.ceil(filteredItems.length / pageSize));
+    if (page > totalPages) setPage(1);
+    const visibleItems = filteredItems.slice((page - 1) * pageSize, page * pageSize);
 
     return (
         <SectionCard>
@@ -91,66 +82,66 @@ export function ItemsCard({ filters }: { filters: Filters }) {
                             <th className="py-3 pr-4 font-medium">Quantity</th>
                             <th className="py-3 pr-4 font-medium">Location</th>
                             <th className="py-3 pr-4 font-medium">Expiry Date</th>
-                            <th className="py-3 pr-2 font-medium">Actions</th>
                         </tr>
                     </thead>
-
-                    <tbody className="divide-y">
-                        {filteredItems.map((i) => {
-                            const expDate = i.expirationDate ? dayjs(i.expirationDate) : null;
-                            const diff = expDate ? expDate.diff(dayjs(), "day") : null;
-
-                            const statusText = !expDate
-                                ? "No expiration"
-                                : diff! < 0
-                                    ? `Expired ${Math.abs(diff!)}d ago`
-                                    : diff! <= 7
-                                        ? `Expires in ${diff!}d`
-                                        : diff! <= 30
-                                            ? `Expires in ${diff!}d`
-                                            : "Valid";
-
-                            const statusColor = !expDate
-                                ? "text-gray-500"
-                                : diff! < 0
-                                    ? "text-red-600"
-                                    : diff! <= 7
-                                        ? "text-[#B45309]"
-                                        : "text-gray-500";
-
-                            return (
-                                <tr key={i.id} className="align-middle">
-                                    <td className="py-4 pr-4">
-                                        <div className="font-medium">{i.name}</div>
-                                        <div className="text-xs text-gray-500">{i.id}</div>
-                                    </td>
-
-                                    <td className="py-4 pr-4">
-                                        <Chip>{i.categoryName}</Chip>
-                                    </td>
-
-                                    <td className="py-4 pr-4 font-mono tracking-wide">{i.code}</td>
-
-                                    <td className="py-4 pr-4">{i.quantity} {i.unit}</td>
-
-                                    <td className="py-4 pr-4">{i.location}</td>
-
-                                    <td className="py-4 pr-4">
-                                        <div>{expDate ? expDate.format("YYYY-MM-DD") : "-"}</div>
-                                        <div className={`text-xs ${statusColor}`}>{statusText}</div>
-                                    </td>
-
-                                    <td className="py-4 pr-2">
-                                        <div className="flex gap-2">
-                                            <ActionButton onClick={() => { }}>View</ActionButton>
-                                            <ActionButton onClick={() => { }}>Update</ActionButton>
-                                        </div>
-                                    </td>
-                                </tr>
-                            );
-                        })}
-                    </tbody>
                 </table>
+
+                <div className="h-90 overflow-y-auto">
+                    <table className="min-w-full text-sm">
+                        <tbody className="divide-y">
+                            {visibleItems.map((i) => {
+                                const expDate = i.expirationDate ? dayjs(i.expirationDate) : null;
+                                const diff = expDate ? expDate.diff(dayjs(), "day") : null;
+
+                                const statusText = !expDate
+                                    ? "No expiration"
+                                    : diff! < 0
+                                        ? `Expired ${Math.abs(diff!)}d ago`
+                                        : diff! <= 7
+                                            ? `Expires in ${diff!}d`
+                                            : diff! <= 30
+                                                ? `Expires in ${diff!}d`
+                                                : "Valid";
+
+                                const statusColor = !expDate
+                                    ? "text-gray-500"
+                                    : diff! < 0
+                                        ? "text-red-600"
+                                        : diff! <= 7
+                                            ? "text-[#B45309]"
+                                            : "text-gray-500";
+
+                                return (
+                                    <tr key={i.id} className="align-middle">
+                                        <td className="py-4 pr-4">
+                                            <div className="font-medium">{i.name}</div>
+                                            <div className="text-xs text-gray-500">{i.id}</div>
+                                        </td>
+
+                                        <td className="py-4 pr-4">
+                                            <Chip>{i.categoryName}</Chip>
+                                        </td>
+
+                                        <td className="py-4 pr-4 font-mono tracking-wide">{i.code}</td>
+
+                                        <td className="py-4 pr-4">{i.quantity} {i.unit}</td>
+
+                                        <td className="py-4 pr-4">{i.location}</td>
+
+                                        <td className="py-4 pr-4">
+                                            <div>{expDate ? expDate.format("YYYY-MM-DD") : "-"}</div>
+                                            <div className={`text-xs ${statusColor}`}>{statusText}</div>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div className="mt-3 flex justify-center">
+                <Pagination count={totalPages} page={page} onChange={(_, value) => setPage(value)} />
             </div>
         </SectionCard>
     );

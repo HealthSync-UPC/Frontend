@@ -62,6 +62,14 @@ export class ZonesServices {
         const data = { userId: member.id };
         return http.post<{ accessGranted: boolean }>(`${this.endpoint}/${zone.id}/access`, data);
     }
+
+    async updateZoneTemperature(zone: Zone) {
+        return http.put<Zone>(`${this.endpoint}/${zone.id}/temperature`, zone);
+    }
+
+    async updateZoneHumidity(zone: Zone) {
+        return http.put<Zone>(`${this.endpoint}/${zone.id}/humidity`, zone);
+    }
 }
 
 export const zonesService = new ZonesServices();
