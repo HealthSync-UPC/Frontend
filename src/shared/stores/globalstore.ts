@@ -1,24 +1,23 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
+import { Alert } from "../../alert/model/alert";
+import { alertService } from "../../alert/services/alert-service";
 import { User } from "../../iam/model/user";
 import { VerifyTotpRequest } from "../../iam/model/verify-totp-request";
 import { authService } from "../../iam/services/user-services";
-import type { JwtPayload } from "../utils/jwt-decode";
-import { getTokenData } from "../utils/jwt-decode";
-import { User as Profile } from "../../settings/model/User";
-import { profileService } from "../../settings/services/userService";
-import type { Iot } from "../../iot/model/iot";
-import type { Createreading } from "../../iot/model/createreading";
-import { iotService } from "../../iot/services/iot-services";
 import type { Category } from "../../inventory/model/category";
 import type { Item } from "../../inventory/model/item";
 import { inventoryService } from "../../inventory/service/inventory-service";
+import type { Createreading } from "../../iot/model/createreading";
+import type { Iot } from "../../iot/model/iot";
+import { iotService } from "../../iot/services/iot-services";
+import { User as Profile } from "../../settings/model/User";
+import { profileService } from "../../settings/services/userService";
 import type { Member } from "../../zones/model/member";
 import { Zone } from "../../zones/model/zone";
 import { zonesService } from "../../zones/services/zones-services";
-import type { Alert } from "../../alert/model/alert";
-import { alertService } from "../../alert/services/alert-service";
-import { io, type Socket } from "socket.io-client";
+import type { JwtPayload } from "../utils/jwt-decode";
+import { getTokenData } from "../utils/jwt-decode";
 interface GlobalState {
     // IAM
     user: User;
@@ -74,7 +73,7 @@ interface GlobalState {
     addProfile: (profile: Profile) => Promise<void>;
 
     // Socket
-    socket: Socket | null;
+    socket: WebSocket | null;
     connectSocket: () => void;
 }
 
@@ -568,13 +567,41 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
     // Socket
     socket: null,
     connectSocket: () => {
-        const socketUrl = import.meta.env.VITE_API_BASE_URL_SOCKETIO || "http://localhost:8081";
-        const newSocket = io(`${socketUrl}?token=${localStorage.getItem("token")}`, { transports: ["websocket"], });
-        /* const newSocket = io(socketUrl, {
-            transports: ["websocket"],
-            auth: { token: localStorage.getItem("token") }
-        }); */
+        const token = localStorage.getItem("token");
+        const socketUrl = import.meta.env.VITE_API_BASE_URL_WS || "ws://localhost:8080/ws";
+        const ws = new WebSocket(`${socketUrl}?token=${token}`);
 
-        set({ socket: newSocket });
+        ws.onopen = () => {
+            console.log("WebSocket connected");
+        };
+
+        ws.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+
+                const newAlert = new Alert(
+                    data.id,
+                    data.type,
+                    data.zoneId,
+                    data.location,
+                    new Date(data.registeredAt)
+                );
+
+                set(state => { state.alerts.push(newAlert); });
+            } catch (error) {
+                console.error("Error parsing WebSocket message:", error);
+            }
+        };
+
+        ws.onclose = (event) => {
+            console.log("WebSocket closed:", event.reason);
+            setTimeout(() => get().connectSocket(), 3000);
+        };
+
+        ws.onerror = (error) => {
+            console.error("WebSocket error:", error);
+        };
+
+        set({ socket: ws });
     },
 })));
