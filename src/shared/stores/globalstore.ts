@@ -16,6 +16,8 @@ import { inventoryService } from "../../inventory/service/inventory-service";
 import type { Member } from "../../zones/model/member";
 import { Zone } from "../../zones/model/zone";
 import { zonesService } from "../../zones/services/zones-services";
+import type { Alert } from "../../alert/model/alert";
+import { alertService } from "../../alert/services/alert-service";
 interface GlobalState {
     // IAM
     user: User;
@@ -43,6 +45,11 @@ interface GlobalState {
     getItems: () => Promise<void>;
     addItem: (item: Item) => Promise<void>;
     deleteItem: (item: Item) => Promise<void>;
+
+    // Alerts
+    alerts: Alert[];
+    getAlerts: () => Promise<void>;
+    getAlertsByZoneId: (zoneId: number) => Promise<void>;
 
     // Zones
     zones: Zone[];
@@ -190,6 +197,35 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
             }
         } catch (error) {
             console.error("Error deleting device:", error);
+        }
+    },
+
+    // Alerts
+    alerts: [],
+    getAlerts: async () => {
+        try {
+            const response = await alertService.getAlerts();
+            if (response.data) {
+                set(state => {
+                    state.alerts = response.data;
+                });
+                console.log("Fetched alerts:", response.data);
+            }
+        } catch (error) {
+            console.error("Error fetching alerts:", error);
+        }
+    },
+    getAlertsByZoneId: async (zoneId: number) => {
+        try {
+            const response = await alertService.getAlertsById(zoneId);
+            if (response.data) {
+                set(state => {
+                    state.alerts = response.data;
+                });
+                console.log(`Fetched alerts for zoneId ${zoneId}:`, response.data);
+            }
+        } catch (error) {
+            console.error(`Error fetching alerts for zoneId ${zoneId}:`, error);
         }
     },
 

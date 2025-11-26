@@ -1,6 +1,7 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import SearchIcon from '@mui/icons-material/Search';
+import { useEffect } from 'react';
 import { useGlobalStore } from '../../shared/stores/globalstore';
 import { SectionCard } from './ui';
 
@@ -10,11 +11,14 @@ export type Filters = {
     location: 'All' | string;
 };
 
-// TODO: Move locations to global store
-const LOCATIONS: any[] = ['Pharmacy Cold Storage A', 'Laboratory Refrigerator', 'Storage Room C', 'Blood Bank Storage'];
-
 export function FiltersCard({ filters, onChange, }: { filters: Filters; onChange: (f: Filters) => void; }) {
-    const { categories } = useGlobalStore();
+    const { categories, zones, getZones } = useGlobalStore();
+
+    useEffect(() => {
+        if ((!zones || zones.length === 0) && getZones) {
+            getZones();
+        }
+    }, [zones, getZones]);
 
     return (
         <SectionCard>
@@ -56,7 +60,7 @@ export function FiltersCard({ filters, onChange, }: { filters: Filters; onChange
                         className="h-10 w-full appearance-none rounded-md border border-gray-300 px-3 text-sm text-gray-700"
                     >
                         <option>All</option>
-                        {LOCATIONS.map(l => <option key={l}>{l}</option>)}
+                        {zones?.map((z) => <option key={z.id}>{z.name}</option>)}
                     </select>
                     <ExpandMoreIcon className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 </div>

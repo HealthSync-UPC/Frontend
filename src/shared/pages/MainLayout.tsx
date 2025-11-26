@@ -14,7 +14,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 export function MainLayout() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { getDevices, getCategories, getItems, getZones, getProfiles } = useGlobalStore();
+    const { getDevices, getCategories, getItems, getZones, getProfiles, getAlerts } = useGlobalStore();
     const { setJwt } = useGlobalStore();
 
     const menuItems = [
@@ -37,6 +37,7 @@ export function MainLayout() {
         getItems();
         getProfiles();
         getZones();
+        getAlerts();
     }, [])
 
     return (
