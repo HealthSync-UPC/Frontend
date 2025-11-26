@@ -1,13 +1,26 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useGlobalStore } from '../../shared/stores/globalstore';
 import { ActiveAlertsCard } from '../components/ActiveAlertsCard';
+import { Alert } from '../model/alert';
 
 export function AlertPage() {
-    const { zones } = useGlobalStore();
+    const { zones, socket, addAlert } = useGlobalStore();
     const [typeFilter, setTypeFilter] = useState<string>('all');
     const [locationFilter, setLocationFilter] = useState<string>('all');
+
+    useEffect(() => {
+        socket?.on("alert", (data: Alert) => {
+            console.log("Nuevo evento recibido:", data);
+            const newAlert = new Alert(data.id, data.type, data.zoneId, data.location, new Date(data.registeredAt));
+            addAlert(newAlert);
+        });
+
+        return () => {
+            socket?.off("alert");
+        };
+    }, [socket]);
 
     return (
         <div className="flex flex-col gap-10">

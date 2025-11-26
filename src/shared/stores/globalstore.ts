@@ -3,7 +3,7 @@ import { immer } from "zustand/middleware/immer";
 import { User } from "../../iam/model/user";
 import { VerifyTotpRequest } from "../../iam/model/verify-totp-request";
 import { authService } from "../../iam/services/user-services";
-import type { JwtPayload } from "jwt-decode";
+import type { JwtPayload } from "../utils/jwt-decode";
 import { getTokenData } from "../utils/jwt-decode";
 import { User as Profile } from "../../settings/model/User";
 import { profileService } from "../../settings/services/userService";
@@ -18,6 +18,7 @@ import { Zone } from "../../zones/model/zone";
 import { zonesService } from "../../zones/services/zones-services";
 import type { Alert } from "../../alert/model/alert";
 import { alertService } from "../../alert/services/alert-service";
+import { io, type Socket } from "socket.io-client";
 interface GlobalState {
     // IAM
     user: User;
@@ -50,6 +51,7 @@ interface GlobalState {
     alerts: Alert[];
     getAlerts: () => Promise<void>;
     getAlertsByZoneId: (zoneId: number) => Promise<void>;
+    addAlert: (alert: Alert) => void;
 
     // Zones
     zones: Zone[];
@@ -70,6 +72,10 @@ interface GlobalState {
     profiles: Profile[],
     getProfiles: () => Promise<void>;
     addProfile: (profile: Profile) => Promise<void>;
+
+    // Socket
+    socket: Socket | null;
+    connectSocket: () => void;
 }
 
 export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
@@ -229,6 +235,11 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
         } catch (error) {
             console.error(`Error fetching alerts for zoneId ${zoneId}:`, error);
         }
+    },
+    addAlert: (alert: Alert) => {
+        set(state => {
+            state.alerts.push(alert);
+        });
     },
 
     // Inventory
@@ -552,5 +563,18 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
         } catch (error) {
             console.error("Error adding profile:", error);
         }
-    }
+    },
+
+    // Socket
+    socket: null,
+    connectSocket: () => {
+        const socketUrl = import.meta.env.VITE_API_BASE_URL_SOCKETIO || "http://localhost:8081";
+        const newSocket = io(`${socketUrl}?token=${localStorage.getItem("token")}`, { transports: ["websocket"], });
+        /* const newSocket = io(socketUrl, {
+            transports: ["websocket"],
+            auth: { token: localStorage.getItem("token") }
+        }); */
+
+        set({ socket: newSocket });
+    },
 })));

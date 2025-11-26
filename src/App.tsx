@@ -15,12 +15,13 @@ import ZoneManagementPage from "./zones/pages/ZonesPage"
 import { AlertPage } from "./alert/pages/AlertPage"
 
 function App() {
-  const { setJwt } = useGlobalStore();
+  const { setJwt, connectSocket } = useGlobalStore();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
       setJwt(token);
+      connectSocket();
     }
   }, []);
 
