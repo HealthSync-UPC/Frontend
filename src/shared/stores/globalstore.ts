@@ -571,33 +571,6 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
         const socketUrl = import.meta.env.VITE_API_BASE_URL_WS || "ws://localhost:8080/ws";
         const ws = new WebSocket(`${socketUrl}?token=${token}`);
 
-        ws.onopen = () => {
-            console.log("WebSocket connected");
-        };
-
-        ws.onmessage = (event) => {
-            try {
-                const data = JSON.parse(event.data);
-
-                const newAlert = new Alert(
-                    data.id,
-                    data.type,
-                    data.zoneId,
-                    data.location,
-                    new Date(data.registeredAt)
-                );
-
-                set(state => { state.alerts.push(newAlert); });
-            } catch (error) {
-                console.error("Error parsing WebSocket message:", error);
-            }
-        };
-
-        ws.onclose = (event) => {
-            console.log("WebSocket closed:", event.reason);
-            setTimeout(() => get().connectSocket(), 3000);
-        };
-
         ws.onerror = (error) => {
             console.error("WebSocket error:", error);
         };
