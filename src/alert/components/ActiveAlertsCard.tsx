@@ -28,52 +28,44 @@ export function ActiveAlertsCard({ typeFilter, locationFilter }: { typeFilter?: 
             <p className="font-medium">Alerts {rows.length}</p>
             <p className="text-sm text-[#67737C] mb-4">Real-time monitoring alerts from your medical equipment</p>
 
-            <div className="overflow-x-auto">
-                <table className="min-w-full text-sm">
-                    <thead>
-                        <tr className="text-left text-gray-600 border-b">
-                            <th className="py-3 pr-4 font-medium">Alert ID</th>
-                            <th className="py-3 pr-4 font-medium">Type</th>
-                            <th className="py-3 pr-4 font-medium">Location</th>
-                            <th className="py-3 pr-4 font-medium">Registered At</th>
-                        </tr>
-                    </thead>
-                </table>
+            <div>
+                <div className="flex text-gray-600 border-b text-sm px-4 py-2">
+                    <label className="flex-1 font-medium">Alert ID</label>
+                    <label className="flex-1 font-medium">Type</label>
+                    <label className="flex-1 font-medium">Location</label>
+                    <label className="flex-1 font-medium">Registered At</label>
+                </div>
 
-                <div className="h-75 overflow-y-auto">
-                    <table className="min-w-full text-sm">
-                        <tbody className="divide-y">
-                            {visibleRows.map(row => {
-                                const rawType = row.type || '';
-                                const formattedType = rawType.replace(/[_-]/g, ' ').toLowerCase().split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-                                const getVariant = (t: string) => {
-                                    const up = t.toUpperCase();
-                                    if (up.includes('HIGH')) return 'high';
-                                    if (up.includes('LOW')) return 'low';
-                                    return 'gray';
-                                };
-                                const variant = getVariant(rawType);
-                                const colorClasses = variant === 'low'
-                                    ? 'bg-[#E6F4FF] text-[#1E90FF]'
-                                    : variant === 'high'
-                                        ? 'bg-[#FFF3E8] text-[#FF4500]'
-                                        : 'bg-gray-100 text-gray-700';
+                <div className="h-80">
+                    {visibleRows.map(row => {
+                        const rawType = row.type || '';
+                        const formattedType = rawType.replace(/[_-]/g, ' ').toLowerCase().split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                        const getVariant = (t: string) => {
+                            const up = t.toUpperCase();
+                            if (up.includes('HIGH')) return 'high';
+                            if (up.includes('LOW')) return 'low';
+                            return 'gray';
+                        };
+                        const variant = getVariant(rawType);
+                        const colorClasses = variant === 'low'
+                            ? 'bg-[#E6F4FF] text-[#1E90FF]'
+                            : variant === 'high'
+                                ? 'bg-[#FFF3E8] text-[#FF4500]'
+                                : 'bg-gray-100 text-gray-700';
 
-                                return (
-                                    <tr key={row.id} className="align-middle">
-                                        <td className="py-4 pr-4 font-mono tracking-wider">{row.id}</td>
-                                        <td className="py-4 pr-4">
-                                            <span className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs ${colorClasses}`}>
-                                                {formattedType}
-                                            </span>
-                                        </td>
-                                        <td className="py-4 pr-4">{row.location}</td>
-                                        <td className="py-4 pr-4">{dayjs(row.registeredAt).format('LLL')}</td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                        return (
+                            <div key={row.id} className="flex my-5 text-gray-600 border-b text-sm px-4 py-2">
+                                <label className="flex-1 font-medium">{row.id}</label>
+                                <label className="flex-1 font-medium">
+                                    <span className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs ${colorClasses}`}>
+                                        {formattedType}
+                                    </span>
+                                </label>
+                                <label className="flex-1 font-medium">{row.location}</label>
+                                <label className="flex-1 font-medium">{dayjs(row.registeredAt).format('LLL')}</label>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
 

@@ -51,6 +51,9 @@ interface GlobalState {
     getAlerts: () => Promise<void>;
     getAlertsByZoneId: (zoneId: number) => Promise<void>;
     addAlert: (alert: Alert) => void;
+    openSnackBar: boolean;
+    setOpenSnackBar: (open: boolean) => void;
+    message: string;
 
     // Zones
     zones: Zone[];
@@ -240,6 +243,13 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
             state.alerts.push(alert);
         });
     },
+    openSnackBar: false,
+    setOpenSnackBar: (open: boolean) => {
+        set(state => {
+            state.openSnackBar = open;
+        });
+    },
+    message: "",
 
     // Inventory
     categories: [],
@@ -579,6 +589,9 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
             try {
                 const data = JSON.parse(event.data);
 
+                if (data.id == undefined)
+                    return;
+
                 const newAlert = new Alert(
                     data.id,
                     data.type,
@@ -587,7 +600,19 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
                     new Date(data.registeredAt)
                 );
 
-                set(state => { state.alerts.push(newAlert); });
+                const message = {
+                    LOW_HUMIDITY: `Low humidity detected in ${newAlert.location}`,
+                    HIGH_HUMIDITY: `High humidity detected in ${newAlert.location}`,
+                    HIGH_TEMPERATURE: `High temperature detected in ${newAlert.location}`,
+                    LOW_TEMPERATURE: `Low temperature detected in ${newAlert.location}`
+                }[newAlert.type] || `Alert registered in ${newAlert.location}`;
+
+                set(state => {
+                    state.alerts.push(data);
+                    state.openSnackBar = true;
+                    state.message = message;
+                });
+
             } catch (error) {
                 console.error("Error parsing WebSocket message:", error);
             }

@@ -1,20 +1,31 @@
-import { Outlet, useNavigate, useLocation } from "react-router";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import MemoryIcon from "@mui/icons-material/Memory";
+import { Outlet, useLocation, useNavigate } from "react-router";
 /* import ShowChartIcon from "@mui/icons-material/ShowChart"; */
-import WarningIcon from "@mui/icons-material/Warning";
 import InventoryIcon from "@mui/icons-material/Inventory";
+import WarningIcon from "@mui/icons-material/Warning";
 /* import ArticleIcon from "@mui/icons-material/Article"; */
-import SettingsIcon from "@mui/icons-material/Settings";
-import { useEffect } from "react";
-import { useGlobalStore } from "../stores/globalstore";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import LogoutIcon from '@mui/icons-material/Logout';
+import SettingsIcon from "@mui/icons-material/Settings";
+import { Alert, Snackbar } from "@mui/material";
+import { useEffect } from "react";
+import { useGlobalStore } from "../stores/globalstore";
 
 export function MainLayout() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { getDevices, getCategories, getItems, getZones, getProfiles, getAlerts } = useGlobalStore();
+    const {
+        getDevices,
+        getCategories,
+        getItems,
+        getZones,
+        getProfiles,
+        getAlerts,
+        openSnackBar,
+        setOpenSnackBar,
+        message
+    } = useGlobalStore();
     const { setJwt } = useGlobalStore();
 
     const menuItems = [
@@ -112,6 +123,26 @@ export function MainLayout() {
                     <Outlet />
                 </div>
             </div>
+            <Snackbar
+                open={openSnackBar}
+                autoHideDuration={5000}
+                onClose={() => setOpenSnackBar(false)}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            >
+                <Alert
+                    variant="filled"
+                    severity="warning"
+                    onClose={() => setOpenSnackBar(false)}
+                    sx={{
+                        width: "100%",
+                        borderRadius: "10px",
+                        fontWeight: 600,
+                        fontSize: "0.9rem",
+                    }}
+                >
+                    {message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 }
