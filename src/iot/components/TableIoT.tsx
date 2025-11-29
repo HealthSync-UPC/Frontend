@@ -43,6 +43,7 @@ const statusUI: Record<StatusKey, {
 const typeUI: Record<string, string> = {
     TEMPERATURE: "Temperature",
     HUMIDITY: "Humidity",
+    GAS: "Gas",
     ACCESS_NFC: "Access NFC",
 };
 

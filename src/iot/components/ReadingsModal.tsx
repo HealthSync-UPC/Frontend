@@ -1,6 +1,7 @@
-import { Modal, Box } from '@mui/material';
+import { Modal, Box, Pagination } from '@mui/material';
 import type { Iot } from '../model/iot';
 import dayjs from "dayjs";
+import { useState } from 'react';
 
 interface ReadingsModalProps {
     open: boolean;
@@ -11,9 +12,24 @@ interface ReadingsModalProps {
 export function ReadingsModal({ open, onClose, device }: ReadingsModalProps) {
     if (!device) return null;
 
+    const typeLabelMap: Record<string, string> = {
+        TEMPERATURE: 'Temperature',
+        HUMIDITY: 'Humidity',
+        GAS: 'Gas',
+        ACCESS_NFC: 'Access NFC',
+    };
+
+    const typeLabel = typeLabelMap[device.type] ?? device.type;
+
     const readings = [...(device.readings ?? [])].sort((a, b) => {
         return dayjs(b.readingAt).valueOf() - dayjs(a.readingAt).valueOf();
     });
+
+    const [page, setPage] = useState(1);
+    const pageSize = 10;
+    const totalPages = Math.max(1, Math.ceil(readings.length / pageSize));
+    if (page > totalPages) setPage(1);
+    const visibleReadings = readings.slice((page - 1) * pageSize, page * pageSize);
 
     return (
         <Modal open={open} onClose={onClose}>
@@ -38,7 +54,7 @@ export function ReadingsModal({ open, onClose, device }: ReadingsModalProps) {
                             Readings - {device.name}
                         </h3>
                         <p className="text-sm text-[#67737C]">
-                            Serial: {device.serialNumber} · Type: {device.type} · Location: {device.location}
+                            Serial: {device.serialNumber} · Type: {typeLabel} · Location: {device.location}
                         </p>
                     </div>
 
@@ -65,16 +81,20 @@ export function ReadingsModal({ open, onClose, device }: ReadingsModalProps) {
 
                         {/* Rows */}
                         <div className="divide-y divide-[#DFE6EB] mt-2 text-sm text-[#040C13]">
-                            {readings.map((r) => {
+                            {visibleReadings.map((r) => {
                                 const formatted = dayjs(r.readingAt).format("DD-MM-YYYY h:mm:ss a");
 
                                 return (
                                     <div key={r.id} className="grid grid-cols-2 items-center py-2">
                                         <span>{formatted}</span>
-                                        <span>{r.value}</span>
+                                        <span>{r.value} {device.unit}</span>
                                     </div>
                                 );
                             })}
+                        </div>
+
+                        <div className="mt-3 flex justify-center">
+                            <Pagination count={totalPages} page={page} onChange={(_, value) => setPage(value)} />
                         </div>
                     </div>
                 )}

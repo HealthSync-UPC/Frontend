@@ -47,7 +47,8 @@ export function AddDeviceModal({ open, onClose }: AddDeviceFormProps) {
                         const defaultUnit =
                             value === "TEMPERATURE" ? "°C" :
                                 value === "HUMIDITY" ? "%" :
-                                    "";
+                                    value === "GAS" ? "ppm" :
+                                        "";
 
                         setForm((s) => ({
                             ...s,
@@ -172,6 +173,7 @@ export function AddDeviceModal({ open, onClose }: AddDeviceFormProps) {
                             >
                                 <option value="TEMPERATURE">Temperature</option>
                                 <option value="HUMIDITY">Humidity</option>
+                                <option value="GAS">Gas</option>
                                 <option value="ACCESS_NFC">Access NFC</option>
                             </select>
                         </div>
