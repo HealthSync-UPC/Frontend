@@ -121,35 +121,46 @@ function RecentAccess() {
 
     accessLogs.sort((a, b) => dayjs(b.accessTime).diff(a.accessTime));
 
+    const [page, setPage] = useState(1);
+    const pageSize = 5;
+
+    const totalPages = Math.ceil(accessLogs.length / pageSize);
+    const visibleAccessLogs = accessLogs.slice((page - 1) * pageSize, page * pageSize);
+
     return (
-        <Card>
-            <div className="mb-3 flex items-center gap-2">
-                <ShieldOutlinedIcon />
-                <p className="font-medium">Recent Access</p>
-            </div>
+        <Card className='flex flex-col justify-between h-155 gap-5'>
+            <div>
+                <div className="mb-3 flex items-center gap-2">
+                    <ShieldOutlinedIcon />
+                    <p className="font-medium">Recent Access</p>
+                </div>
 
-            <div className="flex flex-col gap-3">
-                {accessLogs.length === 0 && (
-                    <p className="text-sm text-gray-500">No access events match the selected filters.</p>
-                )}
+                <div className="flex flex-col gap-3">
+                    {accessLogs.length === 0 && (
+                        <p className="text-sm text-gray-500">No access events match the selected filters.</p>
+                    )}
 
-                {accessLogs.map((a, idx) => {
-                    const zone = zones.find((z) => z.accessLogs.includes(a))!;
+                    {visibleAccessLogs.map((a, idx) => {
+                        const zone = zones.find((z) => z.accessLogs.includes(a))!;
 
-                    return (
-                        <div
-                            key={idx}
-                            className="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3"
-                        >
-                            <div>
-                                <p className='font-bold'>Zone: {zone.name}</p>
-                                <p className="font-medium">{a.name}</p>
-                                <p className="text-xs text-gray-500">{dayjs(a.accessTime).format('LLLL')}</p>
+                        return (
+                            <div
+                                key={idx}
+                                className="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3"
+                            >
+                                <div>
+                                    <p className='font-bold'>Zone: {zone.name}</p>
+                                    <p className="font-medium">{a.name}</p>
+                                    <p className="text-xs text-gray-500">{dayjs(a.accessTime).format('LLLL')}</p>
+                                </div>
+                                <AccessBadge type={a.accessGranted ? 'granted' : 'denied'} />
                             </div>
-                            <AccessBadge type={a.accessGranted ? 'granted' : 'denied'} />
-                        </div>
-                    )
-                })}
+                        )
+                    })}
+                </div>
+            </div>
+            <div className='mx-auto'>
+                <Pagination count={totalPages} page={page} onChange={(_, value) => setPage(value)} />
             </div>
         </Card>
     );

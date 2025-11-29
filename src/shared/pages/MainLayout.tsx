@@ -22,9 +22,12 @@ export function MainLayout() {
         getZones,
         getProfiles,
         getAlerts,
-        openSnackBar,
-        setOpenSnackBar,
-        message
+        openSnackBarAlert,
+        setOpenSnackBarAlert,
+        messageAlert,
+        openSnackBarAccess,
+        setOpenSnackBarAccess,
+        messageAccess
     } = useGlobalStore();
     const { setJwt } = useGlobalStore();
 
@@ -124,15 +127,15 @@ export function MainLayout() {
                 </div>
             </div>
             <Snackbar
-                open={openSnackBar}
+                open={openSnackBarAlert}
                 autoHideDuration={5000}
-                onClose={() => setOpenSnackBar(false)}
+                onClose={() => setOpenSnackBarAlert(false)}
                 anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
             >
                 <Alert
                     variant="filled"
                     severity="warning"
-                    onClose={() => setOpenSnackBar(false)}
+                    onClose={() => setOpenSnackBarAlert(false)}
                     sx={{
                         width: "100%",
                         borderRadius: "10px",
@@ -140,7 +143,28 @@ export function MainLayout() {
                         fontSize: "0.9rem",
                     }}
                 >
-                    {message}
+                    {messageAlert}
+                </Alert>
+            </Snackbar>
+
+            <Snackbar
+                open={openSnackBarAccess}
+                autoHideDuration={5000}
+                onClose={() => setOpenSnackBarAccess(false)}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            >
+                <Alert
+                    variant="filled"
+                    severity={messageAccess.includes("granted") ? "success" : "error"}
+                    onClose={() => setOpenSnackBarAccess(false)}
+                    sx={{
+                        width: "100%",
+                        borderRadius: "10px",
+                        fontWeight: 600,
+                        fontSize: "0.9rem",
+                    }}
+                >
+                    {messageAccess}
                 </Alert>
             </Snackbar>
         </div>

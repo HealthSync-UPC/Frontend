@@ -18,6 +18,8 @@ import { Zone } from "../../zones/model/zone";
 import { zonesService } from "../../zones/services/zones-services";
 import type { JwtPayload } from "../utils/jwt-decode";
 import { getTokenData } from "../utils/jwt-decode";
+import { AccessLog } from "../../zones/model/access-log";
+import type { WSIncoming } from "../model/ws-message";
 interface GlobalState {
     // IAM
     user: User;
@@ -51,9 +53,9 @@ interface GlobalState {
     getAlerts: () => Promise<void>;
     getAlertsByZoneId: (zoneId: number) => Promise<void>;
     addAlert: (alert: Alert) => void;
-    openSnackBar: boolean;
-    setOpenSnackBar: (open: boolean) => void;
-    message: string;
+    openSnackBarAlert: boolean;
+    setOpenSnackBarAlert: (open: boolean) => void;
+    messageAlert: string;
 
     // Zones
     zones: Zone[];
@@ -67,6 +69,9 @@ interface GlobalState {
     addIotToZone: (zone: Zone, iot: Iot) => Promise<void>;
     removeIotFromZone: (zone: Zone, iot: Iot) => Promise<void>;
     tryAccess: (zone: Zone, member: Member) => Promise<boolean>;
+    openSnackBarAccess: boolean;
+    setOpenSnackBarAccess: (open: boolean) => void;
+    messageAccess: string;
 
     // Settings
     updateZoneTemperature: (zone: Zone) => Promise<void>;
@@ -243,13 +248,13 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
             state.alerts.push(alert);
         });
     },
-    openSnackBar: false,
-    setOpenSnackBar: (open: boolean) => {
+    openSnackBarAlert: false,
+    setOpenSnackBarAlert: (open: boolean) => {
         set(state => {
-            state.openSnackBar = open;
+            state.openSnackBarAlert = open;
         });
     },
-    message: "",
+    messageAlert: "",
 
     // Inventory
     categories: [],
@@ -514,6 +519,13 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
             return false;
         }
     },
+    openSnackBarAccess: false,
+    setOpenSnackBarAccess: (open: boolean) => {
+        set(state => {
+            state.openSnackBarAccess = open;
+        });
+    },
+    messageAccess: "",
 
     // Settings
     updateZoneTemperature: async (zone: Zone) => {
@@ -587,31 +599,58 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
 
         ws.onmessage = (event) => {
             try {
-                const data = JSON.parse(event.data);
+                const data: WSIncoming = JSON.parse(event.data);
 
-                if (data.id == undefined)
-                    return;
+                switch (data.type) {
+                    case "alert": {
+                        const p = data.payload as Alert;
+                        const newAlert = new Alert(
+                            p.id,
+                            p.type,
+                            p.zoneId,
+                            p.location,
+                            new Date(p.registeredAt)
+                        );
 
-                const newAlert = new Alert(
-                    data.id,
-                    data.type,
-                    data.zoneId,
-                    data.location,
-                    new Date(data.registeredAt)
-                );
+                        const message = {
+                            LOW_HUMIDITY: `Low humidity detected in ${newAlert.location}`,
+                            HIGH_HUMIDITY: `High humidity detected in ${newAlert.location}`,
+                            HIGH_TEMPERATURE: `High temperature detected in ${newAlert.location}`,
+                            LOW_TEMPERATURE: `Low temperature detected in ${newAlert.location}`
+                        }[newAlert.type] || `Alert registered in ${newAlert.location}`;
 
-                const message = {
-                    LOW_HUMIDITY: `Low humidity detected in ${newAlert.location}`,
-                    HIGH_HUMIDITY: `High humidity detected in ${newAlert.location}`,
-                    HIGH_TEMPERATURE: `High temperature detected in ${newAlert.location}`,
-                    LOW_TEMPERATURE: `Low temperature detected in ${newAlert.location}`
-                }[newAlert.type] || `Alert registered in ${newAlert.location}`;
+                        set(state => {
+                            state.alerts.push(newAlert);
+                            state.openSnackBarAlert = true;
+                            state.messageAlert = message;
+                        });
+                        break;
+                    }
 
-                set(state => {
-                    state.alerts.push(data);
-                    state.openSnackBar = true;
-                    state.message = message;
-                });
+                    case "access": {
+                        const p = data.payload as AccessLog;
+                        const accessLog = new AccessLog(
+                            p.id,
+                            p.name,
+                            new Date(p.accessTime),
+                            p.accessGranted
+                        );
+
+                        const message = accessLog.accessGranted
+                            ? `Access granted to ${accessLog.name}`
+                            : `Access denied to ${accessLog.name}`;
+
+                        set(state => {
+                            state.openSnackBarAccess = true;
+                            state.messageAccess = message;
+                            state.getZones();
+                        });
+                        break;
+                    }
+
+                    default:
+                        console.warn("WS tipo desconocido:", data);
+                }
 
             } catch (error) {
                 console.error("Error parsing WebSocket message:", error);
